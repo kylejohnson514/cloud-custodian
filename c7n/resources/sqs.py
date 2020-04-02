@@ -214,7 +214,7 @@ class AddPolicyStatements(AddPolicyBase):
                         "Sid": "AddedPolicy",
                         "Effect": "Allow",
                         "Principal": "*",
-                        "Action": ["SNS:GetTopicAttributes"],
+                        "Action": ["SNS:GetQueueAttributes"],
                         "Resource": queue_url,
                         }]
     """
