@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\",\"Resource\":\"https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy\"}]}"
+        },
+        "ResponseMetadata": {
+            "RequestId": "90dc1796-6de8-5c8b-8a5b-40966c7bbfd7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "90dc1796-6de8-5c8b-8a5b-40966c7bbfd7",
+                "date": "Thu, 02 Apr 2020 15:05:55 GMT",
+                "content-type": "text/xml",
+                "content-length": "889"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
