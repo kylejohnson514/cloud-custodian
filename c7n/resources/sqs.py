@@ -244,7 +244,7 @@ class AddPolicyStatements(AddPolicyBase):
 
         policy['Statement'] = new_policy
         client.set_queue_attributes(
-            QueueUrl=resource['QueueUrl'], Attributes={'Policy': json.dumps(policy),}
+            QueueUrl=resource['QueueUrl'], Attributes={'Policy': json.dumps(policy)}
         )
 
         return {
