@@ -264,7 +264,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
            policies:
               - name: sqs-yank-cross-account
-                resource: sws
+                resource: sqs
                 filters:
                   - type: cross-account
                 actions:
