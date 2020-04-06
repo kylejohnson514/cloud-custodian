@@ -2,16 +2,6 @@
     "status_code": 200,
     "data": {
         "QueueUrl": "https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy",
-        "ResponseMetadata": {
-            "RequestId": "64a98194-dc2a-5956-a154-d694dd58ea0a",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "64a98194-dc2a-5956-a154-d694dd58ea0a",
-                "date": "Thu, 02 Apr 2020 15:05:22 GMT",
-                "content-type": "text/xml",
-                "content-length": "342"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

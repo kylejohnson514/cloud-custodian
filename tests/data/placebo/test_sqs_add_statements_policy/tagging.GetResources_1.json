@@ -22,16 +22,6 @@
                 ]
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "7d861b95-f26b-4e4f-aed5-1ce09fcdfb16",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "7d861b95-f26b-4e4f-aed5-1ce09fcdfb16",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "268",
-                "date": "Thu, 02 Apr 2020 15:05:23 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

@@ -14,16 +14,6 @@
             "DelaySeconds": "0",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
-        "ResponseMetadata": {
-            "RequestId": "d1534115-3e74-5963-81b9-16153f073a83",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d1534115-3e74-5963-81b9-16153f073a83",
-                "date": "Thu, 02 Apr 2020 15:05:23 GMT",
-                "content-type": "text/xml",
-                "content-length": "1164"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }
