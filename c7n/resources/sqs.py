@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import AddPolicyBase, RemovePolicyBase
+from c7n.actions import AddPolicyBase, RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -252,6 +252,40 @@ class AddPolicyStatements(AddPolicyBase):
             'State': 'PolicyAdded',
             'Statements': added,
         }
+
+
+@SQS.action_registry.register('modify-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    permissions = ('sqs:SetQueueAttributes', 'sqs:GetQueueAttributes')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('sqs')
+        for r in resources:
+            policy = json.loads(r.get('Policy') or '{}')
+            policy_statements = policy.setdefault('Statement', [])
+
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed and not added:
+                continue
+
+            results += {
+                'Name': r['QueueUrl'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+
+            policy['Statement'] = new_policy
+            client.set_queue_attributes(
+                QueueUrl=r['QueueUrl'],
+                Attributes={'Policy': json.dumps(policy)}
+            )
+        return results
 
 
 @SQS.action_registry.register('delete')
