@@ -383,6 +383,7 @@ class TestSqsAction(BaseTest):
                                 "Effect": "Allow",
                                 "Principal": "*",
                                 "Action": ["sqs:GetqueueAttributes"],
+                                "Resource": queue_url
                             }
                         ],
                         "remove-statements": [],
@@ -462,6 +463,7 @@ class TestSqsAction(BaseTest):
                                 "Effect": "Allow",
                                 "Principal": "*",
                                 "Action": ["sqs:GetqueueAttributes"],
+                                "Resource": queue_url
                             }
                         ],
                         "remove-statements": ["RemoveMe"],
