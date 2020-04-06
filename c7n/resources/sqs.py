@@ -256,6 +256,28 @@ class AddPolicyStatements(AddPolicyBase):
 
 @SQS.action_registry.register('modify-policy')
 class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify SQS Queue IAM policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: sqs-yank-cross-account
+                resource: sws
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: modify-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["sqs:GetQueueAttributes"],
+                        "Resource": queue_url,
+                            }]
+                    remove-statements: '*'
+    """
     permissions = ('sqs:SetQueueAttributes', 'sqs:GetQueueAttributes')
 
     def process(self, resources):
