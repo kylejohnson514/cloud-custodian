@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:origin-dev",
+            "QueueArn": "arn:aws:sqs:us-east-1:123456789123:origin-dev",
             "ApproximateNumberOfMessages": "5",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",

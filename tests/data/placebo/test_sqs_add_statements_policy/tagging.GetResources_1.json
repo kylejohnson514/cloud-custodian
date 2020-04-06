@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:my-c7n-test",
+                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:my-c7n-test",
                 "Tags": [
                     {
                         "Key": "OwnerContact",
@@ -13,7 +13,7 @@
                 ]
             },
             {
-                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test-queue",
+                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:test-queue",
                 "Tags": [
                     {
                         "Key": "ASV",

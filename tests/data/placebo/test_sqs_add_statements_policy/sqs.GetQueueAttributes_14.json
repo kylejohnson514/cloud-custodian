@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\",\"Resource\":\"https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy\"}]}"
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\",\"Resource\":\"https://queue.amazonaws.com/123456789123/test_sqs_add_statements_policy\"}]}"
         },
         "ResponseMetadata": {}
     }

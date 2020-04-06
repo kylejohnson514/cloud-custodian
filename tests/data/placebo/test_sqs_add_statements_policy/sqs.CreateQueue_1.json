@@ -1,7 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "QueueUrl": "https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy",
+        "QueueUrl": "https://queue.amazonaws.com/123456789123/test_sqs_add_statements_policy",
         "ResponseMetadata": {}
     }
 }
