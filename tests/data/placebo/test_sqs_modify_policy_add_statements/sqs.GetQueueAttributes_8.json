@@ -2,18 +2,28 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:123456789123:origin-dev-test-2",
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test",
             "ApproximateNumberOfMessages": "0",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1546820436",
-            "LastModifiedTimestamp": "1546820436",
+            "CreatedTimestamp": "1552487461",
+            "LastModifiedTimestamp": "1552500971",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
             "MessageRetentionPeriod": "345600",
             "DelaySeconds": "0",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
-        "ResponseMetadata": {}
+        "ResponseMetadata": {
+            "RequestId": "41c0f068-6100-5d54-b7e9-a76105c6f7e8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "41c0f068-6100-5d54-b7e9-a76105c6f7e8",
+                "date": "Thu, 09 Apr 2020 17:59:34 GMT",
+                "content-type": "text/xml",
+                "content-length": "1158"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

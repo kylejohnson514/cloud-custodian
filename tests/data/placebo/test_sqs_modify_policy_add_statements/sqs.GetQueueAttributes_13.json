@@ -2,18 +2,18 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:123456789123:vxe",
-            "ApproximateNumberOfMessages": "0",
-            "ApproximateNumberOfMessagesNotVisible": "0",
-            "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1548892066",
-            "LastModifiedTimestamp": "1548892066",
-            "VisibilityTimeout": "30",
-            "MaximumMessageSize": "262144",
-            "MessageRetentionPeriod": "345600",
-            "DelaySeconds": "0",
-            "ReceiveMessageWaitTimeSeconds": "0"
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}"
         },
-        "ResponseMetadata": {}
+        "ResponseMetadata": {
+            "RequestId": "71fdcfdd-a78e-5afc-bc09-98d4c36afcef",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "71fdcfdd-a78e-5afc-bc09-98d4c36afcef",
+                "date": "Thu, 09 Apr 2020 18:00:04 GMT",
+                "content-type": "text/xml",
+                "content-length": "775"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

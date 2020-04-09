@@ -2,26 +2,17 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:my-c7n-test",
-                "Tags": [
-                    {
-                        "Key": "OwnerContact",
-                        "Value": "ijm065"
-                    }
-                ]
+        "ResourceTagMappingList": [],
+        "ResponseMetadata": {
+            "RequestId": "89f20e85-4a74-45f2-a5d3-0d70d886505c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "89f20e85-4a74-45f2-a5d3-0d70d886505c",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "50",
+                "date": "Thu, 09 Apr 2020 20:50:17 GMT"
             },
-            {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:test-queue",
-                "Tags": [
-                    {
-                        "Key": "ASV",
-                        "Value": "ASVTEST"
-                    }
-                ]
-            }
-        ],
-        "ResponseMetadata": {}
+            "RetryAttempts": 0
+        }
     }
 }

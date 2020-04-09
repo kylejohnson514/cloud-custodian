@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:my-c7n-test",
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:my-c7n-test",
                 "Tags": [
                     {
                         "Key": "OwnerContact",
@@ -13,7 +13,7 @@
                 ]
             },
             {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:test-queue",
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test-queue",
                 "Tags": [
                     {
                         "Key": "ASV",
@@ -22,6 +22,16 @@
                 ]
             }
         ],
-        "ResponseMetadata": {}
+        "ResponseMetadata": {
+            "RequestId": "c08ab177-a96c-4a82-a3c5-38720f1702d4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c08ab177-a96c-4a82-a3c5-38720f1702d4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "268",
+                "date": "Thu, 09 Apr 2020 17:59:33 GMT"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

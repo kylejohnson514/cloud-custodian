@@ -280,15 +280,23 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory).client('sqs')
+        # updated the queue in us-east-1 but NOT us-west-2, causes failure bc statements are incorrect
+        # client = local_session(self.manager.session_factory()).client('sqs')
+
+        # Pulls queue from us-east-1, and it's already correct for what we want, but doesn't update west...
+        client = local_session(self.manager.session_factory(region="us-west-2")).client('sqs')
         for r in resources:
             policy = json.loads(r.get('Policy') or '{}')
             policy_statements = policy.setdefault('Statement', [])
 
+            print(f"Existing policy statements that we want to update: {policy_statements}")
             new_policy, removed = self.remove_statements(
                 policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            print(f"Policy statements that we want to remove: {removed}")
+            print(f"new_policy value after deciding which statements we want to remove: {new_policy}")
             if new_policy is None:
                 new_policy = policy_statements
+            print(f"updated new_policy value to be set for the queue: {new_policy}")
             new_policy, added = self.add_statements(new_policy)
 
             if not removed and not added:
@@ -301,10 +309,13 @@ class ModifyPolicyStatement(ModifyPolicyBase):
             }
 
             policy['Statement'] = new_policy
+            print(f"Setting the policy to have the following value: {policy['Statement']}")
+            print(f"Setting the policy for the queue with url: {r['QueueUrl']}")
             client.set_queue_attributes(
                 QueueUrl=r['QueueUrl'],
                 Attributes={'Policy': json.dumps(policy)}
             )
+        print(f"Results from running this policy: {results}")
         return results
 
 
