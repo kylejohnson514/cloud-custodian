@@ -2,26 +2,7 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:my-c7n-test",
-                "Tags": [
-                    {
-                        "Key": "OwnerContact",
-                        "Value": "ijm065"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:sqs:us-east-1:123456789123:test-queue",
-                "Tags": [
-                    {
-                        "Key": "ASV",
-                        "Value": "ASVTEST"
-                    }
-                ]
-            }
-        ],
+        "ResourceTagMappingList": [],
         "ResponseMetadata": {}
     }
 }

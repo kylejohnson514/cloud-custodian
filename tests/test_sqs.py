@@ -258,80 +258,6 @@ class TestSqsAction(BaseTest):
         self.assertNotIn("Policy", d2)
 
     @functional
-    def test_sqs_add_statements_policy(self):
-        session_factory = self.replay_flight_data("test_sqs_add_statements_policy")
-        client = session_factory().client("sqs")
-        name = "test_sqs_add_statements_policy"
-        queue_url = client.create_queue(QueueName=name)["QueueUrl"]
-
-        def cleanup():
-            client.delete_queue(QueueUrl=queue_url)
-            if self.recording:
-                time.sleep(60)
-
-        self.addCleanup(cleanup)
-
-        client.set_queue_attributes(
-            QueueUrl=queue_url,
-            Attributes={
-                "Policy": json.dumps(
-                    {
-                        "Version": "2012-10-17",
-                        "Statement": [
-                            {
-                                "Sid": "SpecificAllow",
-                                "Effect": "Allow",
-                                "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
-                                "Action": ["sqs:Subscribe"],
-                            },
-                        ],
-                    }
-                ),
-            },
-        )
-
-        p = self.load_policy(
-            {
-                "name": "sqs-add-statements-policy",
-                "resource": "sqs",
-                "filters": [{"QueueUrl": queue_url}],
-                "actions": [
-                    {
-                        "type": "add-statements",
-                        "statements": [
-                            {
-                                "Sid": "AddedStatement",
-                                "Effect": "Allow",
-                                "Principal": "*",
-                                "Action": ["sqs:GetqueueAttributes"],
-                                "Resource": queue_url,
-                            },
-                        ],
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        if self.recording:
-            time.sleep(30)
-
-        self.assertEqual(len(resources), 1)
-        self.assertEqual([r["QueueUrl"] for r in resources], [queue_url])
-
-        data = json.loads(
-            client.get_queue_attributes(
-                QueueUrl=resources[0]["QueueUrl"], AttributeNames=["Policy"]
-            )["Attributes"]["Policy"]
-        )
-
-        self.assertEqual(
-            [s["Sid"] for s in data.get("Statement", ())],
-            ["SpecificAllow", "AddedStatement"],
-        )
-
-    @functional
     def test_sqs_modify_policy_add_statements(self):
         session_factory = self.replay_flight_data("test_sqs_modify_policy_add_statements")
         client = session_factory().client("sqs")
@@ -380,7 +306,7 @@ class TestSqsAction(BaseTest):
                                 "Sid": "AddMe",
                                 "Effect": "Allow",
                                 "Principal": "*",
-                                "Action": ["sqs:GetqueueAttributes"],
+                                "Action": ["sqs:GetQueueAttributes"],
                                 "Resource": queue_url
                             }
                         ],
@@ -429,14 +355,14 @@ class TestSqsAction(BaseTest):
                             {
                                 "Sid": "SpecificAllow",
                                 "Effect": "Allow",
-                                "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                                "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
                                 "Action": ["sqs:Subscribe"],
                             },
                             {
                                 "Sid": "RemoveMe",
                                 "Effect": "Allow",
                                 "Principal": "*",
-                                "Action": ["sqs:GetqueueAttributes"],
+                                "Action": ["sqs:GetQueueAttributes"],
                             }
                         ],
                     }
@@ -460,7 +386,7 @@ class TestSqsAction(BaseTest):
                                 "Sid": "AddMe",
                                 "Effect": "Allow",
                                 "Principal": "*",
-                                "Action": ["sqs:GetqueueAttributes"],
+                                "Action": ["sqs:GetQueueAttributes"],
                                 "Resource": queue_url
                             }
                         ],
