@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-8dbd68a3",
+                                "UserId": "123456789123"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "123456789123",
+                "GroupId": "sg-8dbd68a3",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-94d1d1ee"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
