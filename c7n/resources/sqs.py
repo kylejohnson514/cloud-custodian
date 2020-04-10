@@ -221,8 +221,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory()).client('sqs')
-
+        client = local_session(self.manager.session_factory).client('sqs')
         for r in resources:
             policy = json.loads(r.get('Policy') or '{}')
             policy_statements = policy.setdefault('Statement', [])
@@ -231,7 +230,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 policy_statements, r, CrossAccountAccessFilter.annotation_key)
             if new_policy is None:
                 new_policy = policy_statements
-
             new_policy, added = self.add_statements(new_policy)
 
             if not removed and not added:
@@ -248,7 +246,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 QueueUrl=r['QueueUrl'],
                 Attributes={'Policy': json.dumps(policy)}
             )
-
         return results
 
 

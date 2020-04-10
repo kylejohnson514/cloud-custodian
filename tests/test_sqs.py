@@ -398,7 +398,6 @@ class TestSqsAction(BaseTest):
         )
 
         resources = p.run()
-
         if self.recording:
             time.sleep(30)
 
