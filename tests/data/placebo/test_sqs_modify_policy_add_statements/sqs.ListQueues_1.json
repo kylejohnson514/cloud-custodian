@@ -2,30 +2,8 @@
     "status_code": 200,
     "data": {
         "QueueUrls": [
-            "https://queue.amazonaws.com/644160558196/c7n-mailer-test-queue",
-            "https://queue.amazonaws.com/644160558196/c7nmailer-brenttestq",
-            "https://queue.amazonaws.com/644160558196/gh-event-archive",
-            "https://queue.amazonaws.com/644160558196/my-c7n-test",
-            "https://queue.amazonaws.com/644160558196/origin-dev",
-            "https://queue.amazonaws.com/644160558196/origin-dev-test",
-            "https://queue.amazonaws.com/644160558196/origin-dev-test-2",
-            "https://queue.amazonaws.com/644160558196/origin-dev-test-3",
-            "https://queue.amazonaws.com/644160558196/resource-changes",
-            "https://queue.amazonaws.com/644160558196/test",
-            "https://queue.amazonaws.com/644160558196/test-queue",
-            "https://queue.amazonaws.com/644160558196/test_sqs_modify_policy_add_statements",
-            "https://queue.amazonaws.com/644160558196/vxe"
+            "https://queue.amazonaws.com/123456789123/test_sqs_modify_policy_add_statements"
         ],
-        "ResponseMetadata": {
-            "RequestId": "c5fb795a-d797-569d-8e2a-2e53b352f4a5",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "c5fb795a-d797-569d-8e2a-2e53b352f4a5",
-                "date": "Thu, 09 Apr 2020 17:59:33 GMT",
-                "content-type": "text/xml",
-                "content-length": "1249"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

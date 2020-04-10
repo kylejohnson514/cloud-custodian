@@ -2,29 +2,19 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test_sqs_modify_policy_add_remove_statements",
+            "QueueArn": "arn:aws:sqs:us-east-1:123456789123:test_sqs_modify_policy_add_remove_statements",
             "ApproximateNumberOfMessages": "0",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1586464038",
-            "LastModifiedTimestamp": "1586464477",
+            "CreatedTimestamp": "1586529113",
+            "LastModifiedTimestamp": "1586529114",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
             "MessageRetentionPeriod": "345600",
             "DelaySeconds": "0",
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetQueueAttributes\"}]}",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetQueueAttributes\"}]}",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
-        "ResponseMetadata": {
-            "RequestId": "0b841fdb-87bb-5cf3-891c-48d20b72ade2",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0b841fdb-87bb-5cf3-891c-48d20b72ade2",
-                "date": "Thu, 09 Apr 2020 20:50:17 GMT",
-                "content-type": "text/xml",
-                "content-length": "1695"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

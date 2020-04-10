@@ -2,28 +2,19 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:c7nmailer-brenttestq",
+            "QueueArn": "arn:aws:sqs:us-east-1:123456789123:test_sqs_modify_policy_add_statements",
             "ApproximateNumberOfMessages": "0",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1559780719",
-            "LastModifiedTimestamp": "1559780719",
+            "CreatedTimestamp": "1586530184",
+            "LastModifiedTimestamp": "1586530184",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
             "MessageRetentionPeriod": "345600",
             "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"sqs:Subscribe\"}]}",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
-        "ResponseMetadata": {
-            "RequestId": "23e17db0-73da-59d7-91f2-2ab9171ff36b",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "23e17db0-73da-59d7-91f2-2ab9171ff36b",
-                "date": "Thu, 09 Apr 2020 17:59:33 GMT",
-                "content-type": "text/xml",
-                "content-length": "1174"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }
