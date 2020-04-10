@@ -2,19 +2,7 @@
     "status_code": 200,
     "data": {
         "QueueUrls": [
-            "https://queue.amazonaws.com/123456789123/c7n-mailer-test-queue",
-            "https://queue.amazonaws.com/123456789123/c7nmailer-brenttestq",
-            "https://queue.amazonaws.com/123456789123/gh-event-archive",
-            "https://queue.amazonaws.com/123456789123/my-c7n-test",
-            "https://queue.amazonaws.com/123456789123/origin-dev",
-            "https://queue.amazonaws.com/123456789123/origin-dev-test",
-            "https://queue.amazonaws.com/123456789123/origin-dev-test-2",
-            "https://queue.amazonaws.com/123456789123/origin-dev-test-3",
-            "https://queue.amazonaws.com/123456789123/resource-changes",
-            "https://queue.amazonaws.com/123456789123/test",
-            "https://queue.amazonaws.com/123456789123/test-queue",
-            "https://queue.amazonaws.com/123456789123/test_sqs_modify_policy_add_remove_statements",
-            "https://queue.amazonaws.com/123456789123/vxe"
+            "https://queue.amazonaws.com/123456789123/test_sqs_modify_policy_add_remove_statements"
         ],
         "ResponseMetadata": {}
     }
