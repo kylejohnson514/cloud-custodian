@@ -2099,6 +2099,41 @@ class SecurityGroupTest(BaseTest):
                      'UserIdGroupPairs': [{'GroupId': 'sg-0f9585dc91c9c9655', 'UserId': '123456789123'}]}]}
         )
 
+    def test_security_group_reference_egress_filter(self):
+        factory = self.replay_flight_data("test_security_group_reference_egress_filter")
+        p = self.load_policy(
+            {
+                "name": "security_group_reference_egress_filter",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "egress",
+                        "SGReferences": {
+                            "key": "tag:SampleTagKey",
+                            "value": "SampleTagValue",
+                            "op": "equal"
+                        }
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0],
+            {'Description': 'Test SG with a rule referencing another SG, which is tagged with SampleTagKey=SampleTagValue',
+             'GroupName': 'egress-sg-reference', 'IpPermissions': [
+                {'IpProtocol': '-1', 'IpRanges': [{'CidrIp': '0.0.0.0/0'}], 'Ipv6Ranges': [], 'PrefixListIds': [],
+                 'UserIdGroupPairs': []}], 'OwnerId': '123456789123', 'GroupId': 'sg-065fad86f90aae701',
+             'IpPermissionsEgress': [{'IpProtocol': '-1', 'IpRanges': [], 'Ipv6Ranges': [], 'PrefixListIds': [],
+                                      'UserIdGroupPairs': [{'GroupId': 'sg-0f9585dc91c9c9655', 'UserId': '123456789123'}]}],
+             'VpcId': 'vpc-94d1d1ee', 'MatchedIpPermissionsEgress': [
+                {'IpProtocol': '-1', 'IpRanges': [], 'Ipv6Ranges': [], 'PrefixListIds': [],
+                 'UserIdGroupPairs': [{'GroupId': 'sg-0f9585dc91c9c9655', 'UserId': '123456789123'}]}]}
+        )
+
     def test_egress_ipv6(self):
         p = self.load_policy({
             "name": "ipv6-test",
