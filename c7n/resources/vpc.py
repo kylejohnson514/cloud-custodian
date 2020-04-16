@@ -980,7 +980,9 @@ class SGPermission(Filter):
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
+    filter_attrs = set((
+        'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
+        'SelfReference', 'Description', 'SGReferences'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -1094,6 +1096,24 @@ class SGPermission(Filter):
                 found = True
         return found
 
+    def process_sg_references(self, perm):
+        sg_refs = self.data.get('SGReferences')
+        if sg_refs:
+            sg_perm = perm.get('UserIdGroupPairs', [])
+            if not sg_perm:
+                return False
+            sg_group_ids = [p['GroupId'] for p in sg_perm]
+            sg_resources = self.manager.get_resources(sg_group_ids)
+
+            vf = ValueFilter(sg_refs, self.manager)
+            vf.annotate = False
+
+            for sg in sg_resources:
+                if vf(sg):
+                    return True
+            return False
+        return None
+
     def expand_permissions(self, permissions):
         """Expand each list of cidr, prefix list, user id group pair
         by port/protocol as an individual rule.
@@ -1130,6 +1150,7 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
+            perm_matches['sg-refs'] = self.process_sg_references(perm)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
@@ -1169,6 +1190,7 @@ SGPermissionSchema = {
     'Description': {},
     'Cidr': {},
     'CidrV6': {},
+    'SGReferences': {}
 }
 
 
