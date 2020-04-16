@@ -13,8 +13,6 @@
 # limitations under the License.
 """AWS Account as a custodian resource.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import time
 from botocore.exceptions import ClientError
@@ -1387,23 +1385,8 @@ class SetS3PublicBlock(BaseAction):
                 PublicAccessBlockConfiguration=config)
 
 
-@filters.register('glue-security-config')
-class GlueEncryptionEnabled(MultiAttrFilter):
-    """Filter aws account by its glue encryption status and KMS key """
+class GlueCatalogEncryptionEnabled(MultiAttrFilter):
 
-    """:example:
-
-    .. yaml:
-
-      policies:
-        - name: glue-security-config
-          resource: aws.account
-          filters:
-            - type: glue-security-config
-                key: SseAwsKmsKeyId
-                value: alias/aws/glue
-
-    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1430,14 +1413,16 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                        'AwsKmsKeyId']:
                 attrs.add(key)
         self.multi_attrs = attrs
-        return super(GlueEncryptionEnabled, self).validate()
+        return super(GlueCatalogEncryptionEnabled, self).validate()
 
     def get_target(self, resource):
         if self.annotation in resource:
             return resource[self.annotation]
         client = local_session(self.manager.session_factory).client('glue')
-        encryption_setting = client.get_data_catalog_encryption_settings().get(
-            'DataCatalogEncryptionSettings')
+        encryption_setting = resource.get('DataCatalogEncryptionSettings')
+        if self.manager.type != 'glue-catalog':
+            encryption_setting = client.get_data_catalog_encryption_settings().get(
+                'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
 
@@ -1453,3 +1438,21 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                 return []
             resource[self.annotation][kmskey] = self.data[kmskey]
         return resource[self.annotation]
+
+
+@filters.register('glue-security-config')
+class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
+    """Filter aws account by its glue encryption status and KMS key
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: glue-security-config
+          resource: aws.account
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """
