@@ -980,7 +980,9 @@ class SGPermission(Filter):
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description', 'SGReferences'))
+    filter_attrs = set((
+        'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
+        'SelfReference', 'Description', 'SGReferences'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
