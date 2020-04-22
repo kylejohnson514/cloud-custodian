@@ -974,6 +974,42 @@ class SGPermission(Filter):
             - "::/0"
           op: in
 
+    `SGReferences` can be used to filter out SG references in rules.
+    In this example we want to block ingress rules that reference a SG
+    that is tagged with `Access: Public`.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        SGReferences:
+          key: "tag:Access"
+          value: "Public"
+          op: equal
+
+    We can also filter SG references based on the VPC that they are
+    within. In this example we want to ensure that our outbound rules
+    that reference SGs are only referencing security groups within a
+    specified VPC.
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'VpcId'
+          value: 'vpc-11a1a1aa'
+          op: equal
+
+    Likewise, we can also filter SG references by their description.
+    For example, we can prevent egress rules from referencing any
+    SGs that have a description of "default - DO NOT USE".
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'Description'
+          value: 'default - DO NOT USE'
+          op: equal
 
     """
 
