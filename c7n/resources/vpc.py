@@ -985,6 +985,7 @@ class SGPermission(Filter):
         'SelfReference', 'Description', 'SGReferences'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
+    attrs.add('match-operator')
 
     def validate(self):
         delta = set(self.data.keys()).difference(self.attrs)
@@ -1096,23 +1097,24 @@ class SGPermission(Filter):
                 found = True
         return found
 
-    def process_sg_references(self, perm):
+    def process_sg_references(self, perm, owner_id):
         sg_refs = self.data.get('SGReferences')
-        if sg_refs:
-            sg_perm = perm.get('UserIdGroupPairs', [])
-            if not sg_perm:
-                return False
-            sg_group_ids = [p['GroupId'] for p in sg_perm]
-            sg_resources = self.manager.get_resources(sg_group_ids)
+        if not sg_refs:
+            return None
 
-            vf = ValueFilter(sg_refs, self.manager)
-            vf.annotate = False
-
-            for sg in sg_resources:
-                if vf(sg):
-                    return True
+        sg_perm = perm.get('UserIdGroupPairs', [])
+        if not sg_perm:
             return False
-        return None
+
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_resources = self.manager.get_resources(sg_group_ids)
+        vf = ValueFilter(sg_refs, self.manager)
+        vf.annotate = False
+
+        for sg in sg_resources:
+            if vf(sg):
+                return True
+        return False
 
     def expand_permissions(self, permissions):
         """Expand each list of cidr, prefix list, user id group pair
@@ -1141,6 +1143,7 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         sg_id = resource['GroupId']
+        owner_id = resource['OwnerId']
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
             perm_matches = {}
@@ -1150,7 +1153,7 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
-            perm_matches['sg-refs'] = self.process_sg_references(perm)
+            perm_matches['sg-refs'] = self.process_sg_references(perm, owner_id)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
