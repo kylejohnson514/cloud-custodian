@@ -31,12 +31,8 @@ TEST_DOCKER = docker and os.environ.get("TEST_DOCKER", "no") == "yes"
 
 CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_ORG_IMAGE")
 CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_CLI_IMAGE")
-CUSTODIAN_MAILER_IMAGE = os.environ.get(
-    "CUSTODIAN_MAILER_IMAGE", "cloudcustodian/mailer:latest"
-)
-CUSTODIAN_PSTREAM_IMAGE = os.environ.get(
-    "CUSTODIAN_POLICYSTREAM_IMAGE", "cloudcustodian/policystream:latest"
-)
+CUSTODIAN_MAILER_IMAGE = os.environ.get("CUSTODIAN_MAILER_IMAGE")
+CUSTODIAN_PSTREAM_IMAGE = os.environ.get("CUSTODIAN_POLICYSTREAM_IMAGE")
 
 
 @pytest.fixture
@@ -129,6 +125,37 @@ def test_org_run_aws(custodian_org_dir, custodian_env_creds):
     )
 
 
+@pytest.mark.skipif(not TEST_DOCKER, reason="docker testing not requested")
+@pytest.mark.parametrize(
+    "image_name",
+    list(
+        filter(
+            None,
+            [
+                CUSTODIAN_IMAGE,
+                CUSTODIAN_ORG_IMAGE,
+                CUSTODIAN_MAILER_IMAGE,
+                CUSTODIAN_PSTREAM_IMAGE,
+            ],
+        )
+    ),
+)
+def test_image_metadata(image_name):
+    client = docker.from_env()
+    image = client.images.get(image_name)
+    assert set(image.labels) == {
+        "name",
+        "repository",
+        "org.opencontainers.image.created",
+        "org.opencontainers.image.description",
+        "org.opencontainers.image.documentation",
+        "org.opencontainers.image.licenses",
+        "org.opencontainers.image.title",
+        "org.opencontainers.image.source",
+        "org.opencontainers.image.revision",
+    }
+
+
 @pytest.mark.skipif(
     not (TEST_DOCKER and CUSTODIAN_IMAGE), reason="docker testing not requested"
 )
@@ -146,6 +173,16 @@ def test_cli_providers_available():
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers
+
+
+@pytest.mark.skipif(
+    not (TEST_DOCKER and CUSTODIAN_IMAGE), reason="docker testing not requested"
+)
+def test_cli_version_debug():
+    client = docker.from_env()
+    output = client.containers.run(CUSTODIAN_IMAGE, "version --debug", stderr=True).decode('utf8')
+    assert "Docker: True" in output
+    assert "boto3==" in output
 
 
 @pytest.mark.skipif(

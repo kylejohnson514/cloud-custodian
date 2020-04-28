@@ -133,13 +133,13 @@ class BluePill(pill.Pill):
         )
 
     def get_next_file_path(self, service, operation):
-        fn = super(BluePill, self).get_next_file_path(service, operation)
+        fn, format = super(BluePill, self).get_next_file_path(service, operation)
         # couple of double use cases
         if fn in self._avail:
             self._avail.remove(fn)
         else:
             print("\ndouble use %s\n" % fn)
-        return fn
+        return (fn, format)
 
     def stop(self):
         result = super(BluePill, self).stop()
@@ -165,7 +165,7 @@ class ZippedPill(pill.Pill):
         self.archive = zipfile.ZipFile(self.path, "a", zipfile.ZIP_DEFLATED)
         self._files = set()
 
-        files = set([n for n in self.archive.namelist() if n.startswith(self.prefix)])
+        files = {n for n in self.archive.namelist() if n.startswith(self.prefix)}
 
         if not files:
             return super(ZippedPill, self).record()
@@ -259,6 +259,7 @@ def attach(session, data_path, prefix=None, debug=False):
 
 
 class RedPill(pill.Pill):
+
     def datetime_converter(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
@@ -271,9 +272,9 @@ class RedPill(pill.Pill):
         if 'ResponseMetadata' in response_data:
             response_data['ResponseMetadata'] = {}
 
-        response_data = json.dumps(response_data, default=self.datetime_converter)
+        response_data = json.dumps(response_data, default=serialize)
         response_data = re.sub("\d{12}", ACCOUNT_ID, response_data)  # noqa
-        response_data = json.loads(response_data)
+        response_data = json.loads(response_data, object_hook=deserialize)
 
         super(RedPill, self).save_response(service, operation, response_data,
                     http_response)
