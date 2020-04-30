@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BackupVaultName": "test_backup_vault_modify_policy_add_statements",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:123456789123:backup-vault:test_backup_vault_modify_policy_add_statements",
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 4,
+            "day": 30,
+            "hour": 12,
+            "minute": 52,
+            "second": 2,
+            "microsecond": 27000
+        }
+    }
+}
