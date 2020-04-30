@@ -110,14 +110,13 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                     value: "backup_vault_name"
                 actions:
                   - type: modify-policy
-                    add-statements: [{
-                        "Sid": "ReplaceWithMe",
-                        "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": ["backup:GetBackupVaultAccessPolicy"],
-                        "Resource": backup_vault_arn,
-                            }]
-                    remove-statements: '*'
+                    add-statements:
+                      - "Sid": "AddMe"
+                        "Effect": "Allow"
+                        "Principal": {"AWS": "arn:aws:iam::116249476610:root"}
+                        "Action": ["backup:GetBackupVaultAccessPolicy"]
+                        "Resource": "*"
+                    remove-statements: []
     """
     permissions = ('backup:PutBackupVaultAccessPolicy', 'backup:GetBackupVaultAccessPolicy')
 
