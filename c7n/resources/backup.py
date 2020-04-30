@@ -13,9 +13,13 @@
 # limitations under the License.
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session
+from c7n.actions import ModifyPolicyBase
+
+import json
 
 
 @resources.register('backup-plan')
@@ -87,3 +91,67 @@ class BackupVault(QueryResourceManager):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'EncryptionKeyArn'
+
+
+@BackupVault.action_registry.register('modify-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify Backup Vault IAM policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: backup-vault-get-policy
+                resource: backup-vault
+                filters:
+                  - type: value
+                    key: BackupVaultName
+                    value: "backup_vault_name"
+                actions:
+                  - type: modify-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["backup:GetBackupVaultAccessPolicy"],
+                        "Resource": backup_vault_arn,
+                            }]
+                    remove-statements: '*'
+    """
+    permissions = ('backup:PutBackupVaultAccessPolicy', 'backup:GetBackupVaultAccessPolicy')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('backup')
+
+        for r in resources:
+            policy = json.loads(
+                client.get_backup_vault_access_policy(
+                    BackupVaultName=r['BackupVaultName']
+                )['Policy']
+            )
+            policy_statements = policy.setdefault('Statement', [])
+
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed and not added:
+                continue
+
+            results += {
+                'Name': r['BackupVaultName'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+
+            policy['Statement'] = new_policy
+            client.put_backup_vault_access_policy(
+                BackupVaultName=r['BackupVaultName'],
+                Policy=json.dumps(policy),
+            )
+
+        return results
