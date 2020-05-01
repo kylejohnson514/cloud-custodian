@@ -121,7 +121,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
     permissions = ('backup:PutBackupVaultAccessPolicy', 'backup:GetBackupVaultAccessPolicy')
 
     def process(self, resources):
-        results = []
         client = local_session(self.manager.session_factory).client('backup')
 
         for r in resources:
@@ -141,16 +140,8 @@ class ModifyPolicyStatement(ModifyPolicyBase):
             if not removed and not added:
                 continue
 
-            results += {
-                'Name': r['BackupVaultName'],
-                'State': 'PolicyModified',
-                'Statements': new_policy
-            }
-
             policy['Statement'] = new_policy
             client.put_backup_vault_access_policy(
                 BackupVaultName=r['BackupVaultName'],
                 Policy=json.dumps(policy),
             )
-
-        return results
