@@ -124,11 +124,15 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         client = local_session(self.manager.session_factory).client('backup')
 
         for r in resources:
-            policy = json.loads(
-                client.get_backup_vault_access_policy(
-                    BackupVaultName=r['BackupVaultName']
-                )['Policy']
-            )
+            try:
+                policy = json.loads(
+                    client.get_backup_vault_access_policy(
+                        BackupVaultName=r['BackupVaultName']
+                    )['Policy']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
             policy_statements = policy.setdefault('Statement', [])
 
             new_policy, removed = self.remove_statements(
