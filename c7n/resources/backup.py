@@ -130,8 +130,9 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                         BackupVaultName=r['BackupVaultName']
                     )['Policy']
                 )
+
             except client.exceptions.ResourceNotFoundException:
-                continue
+                policy = {}
 
             policy_statements = policy.setdefault('Statement', [])
 
