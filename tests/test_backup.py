@@ -125,24 +125,6 @@ class BackupVaultTest(BaseTest):
         backup_vault_name = backup_vault["BackupVaultName"]
         backup_vault_arn = backup_vault["BackupVaultArn"]
 
-        client.put_backup_vault_access_policy(
-            BackupVaultName=backup_vault_name,
-            Policy=json.dumps(
-                {
-                    'Version': '2012-10-17',
-                    'Statement': [
-                        {
-                            "Sid": "RemoveMe",
-                            "Effect": "Allow",
-                            "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
-                            "Action": ["backup:PutBackupVaultAccessPolicy"],
-                            "Resource": backup_vault_arn,
-                        }
-                    ],
-                }
-            )
-        )
-
         p = self.load_policy(
             {
                 "name": "test-backup-vault-modify-policy-add-statements",
