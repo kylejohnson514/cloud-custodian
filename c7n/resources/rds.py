@@ -46,6 +46,7 @@ import functools
 import itertools
 import logging
 import operator
+import jmespath
 import re
 from decimal import Decimal as D, ROUND_HALF_UP
 
@@ -109,7 +110,7 @@ class RDS(QueryResourceManager):
         filter_type = 'scalar'
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
-        config_type = 'AWS::RDS::DBInstance'
+        cfn_type = config_type = 'AWS::RDS::DBInstance'
         arn = 'DBInstanceArn'
         universal_taggable = True
         default_report_fields = (
@@ -926,15 +927,32 @@ class RDSSubscription(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'rds'
         arn_type = 'rds-subscription'
+        cfn_type = 'AWS::RDS::EventSubscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
         name = id = "EventSubscriptionArn"
         date = "SubscriptionCreateTime"
-        # config_type = "AWS::DB::EventSubscription"
         # SubscriptionName isn't part of describe events results?! all the
         # other subscription apis.
         # filter_name = 'SubscriptionName'
         # filter_type = 'scalar'
+
+
+class DescribeRDSSnapshot(DescribeSource):
+
+    def augment(self, snaps):
+        return universal_augment(
+            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
+
+
+class ConfigRDSSnapshot(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDSSnapshot, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in item['supplementaryConfiguration']['Tags']]
+        # TODO: Load DBSnapshotAttributes into annotation
+        return resource
 
 
 @resources.register('rds-snapshot')
@@ -954,30 +972,10 @@ class RDSSnapshot(QueryResourceManager):
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBSnapshots',)
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeRDSSnapshot(self)
-        elif source_type == 'config':
-            return ConfigRDSSnapshot(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-
-class DescribeRDSSnapshot(DescribeSource):
-
-    def augment(self, snaps):
-        return universal_augment(
-            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
-
-
-class ConfigRDSSnapshot(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDSSnapshot, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        # TODO: Load DBSnapshotAttributes into annotation
-        return resource
+    source_mapping = {
+        'describe': DescribeRDSSnapshot,
+        'config': ConfigRDSSnapshot
+    }
 
 
 @RDSSnapshot.filter_registry.register('onhour')
@@ -1059,10 +1057,10 @@ class RestoreInstance(BaseAction):
         'rds:RestoreDBInstanceFromDBSnapshot')
 
     poll_period = 60
-    restore_keys = set((
+    restore_keys = {
         'VPCSecurityGroups', 'MultiAZ', 'DBSubnetGroupName',
         'InstanceClass', 'StorageType', 'ParameterGroupName',
-        'OptionGroupName'))
+        'OptionGroupName'}
 
     def validate(self):
         found = False
@@ -1385,7 +1383,7 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
         permissions_enum = ('rds:DescribeDBSubnetGroups',)
-        config_type = 'AWS::RDS::DBSubnetGroup'
+        cfn_type = config_type = 'AWS::RDS::DBSubnetGroup'
 
     source_mapping = {
         'config': ConfigSource,
@@ -1461,8 +1459,9 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = {r.get('DBSubnetGroupName', r['DBInstanceIdentifier'])
-                     for r in rds}
+        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+            self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
     def __call__(self, config):
