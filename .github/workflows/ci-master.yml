@@ -57,11 +57,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: .tox/${{ matrix.tox-target }}
-#          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: .tox/${{ matrix.tox-target }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Test Runner
         run: |
           python -m pip install --upgrade pip
@@ -78,7 +78,7 @@ jobs:
         run: |
           ./.tox/${{ matrix.tox-target }}/bin/coverage xml && \
           bash <(curl -s https://codecov.io/bash) -Z \
-          -f coverage.xml
+          -v -f coverage.xml
 
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
@@ -91,22 +91,22 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.8
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: ~\AppData\Local\pip\Cache
-#          key: pip-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
+          python-version: 3.7
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: pip-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Test Runner
         run: |
           python -m pip install pip
           pip install tox codecov
       - name: Install Deps
         run: |
-          tox -e py38 --notest
+          tox -e py37 --notest
       - name: Test
         run: |
-          tox -e py38
+          tox -e py37
 
   Docs:
     # todo, figure out how to fast cache the tox directory here.
@@ -117,11 +117,11 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: 3.8
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: "~/.cache/pip"
-#          key: docs-${{ runner.os }}-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: "~/.cache/pip"
+          key: docs-${{ runner.os }}-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Tox
         run: |
           python -m pip install --upgrade pip

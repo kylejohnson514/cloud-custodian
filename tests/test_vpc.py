@@ -867,6 +867,36 @@ class NetworkAddrTest(BaseTest):
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
 
+    def test_elastic_ip_get_resources(self):
+        factory = self.replay_flight_data('test_elasticip_get_resources')
+        p = self.load_policy({
+            'name': 'get-addresses',
+            'resource': 'network-addr'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['eipalloc-0da931198e499fdb0'])
+        self.assertJmes('[0].PrivateIpAddress', resources, '192.168.0.99')
+
+    def test_elasticip_error(self):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client('ec2').release_address.side_effect = BotoClientError(
+            {'Error': {'Code': 'xyz'}},
+            operation_name='release_address')
+
+        p = self.load_policy(
+            {
+                "name": "release-network-addr",
+                "resource": "network-addr",
+                "actions": [{"type": "release", "force": False}],
+            },
+            session_factory=mock_factory,
+        )
+        with self.assertRaises(BotoClientError):
+            p.resource_manager.actions[0].process([{
+                'PublicIp': "52.207.185.218",
+                'Domain': 'Vpc',
+                'AllocationId': 'eipalloc-bbaf95b2'}])
+
     def test_elasticip_alias(self):
         try:
             self.load_policy({'name': 'eip', 'resource': 'aws.elastic-ip'}, validate=True)
@@ -2543,7 +2573,8 @@ class EndpointTest(BaseTest):
                 'name': 'vpc-endpoint-cross-account',
                 'resource': 'vpc-endpoint',
                 'filters': [
-                    {'type': 'cross-account'}
+                    {'type': 'cross-account',
+                     'whitelist_orgids': ['o-4amkskbcf1']}
                 ]
             },
             session_factory=session_factory
@@ -2929,3 +2960,77 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertEqual(logs[0]["MaxAggregationInterval"], 60)
+
+
+class TestUnusedKeys(BaseTest):
+    def test_vpc_unused_keys(self):
+        session_factory = self.replay_flight_data("test_vpc_unused_key_delete")
+        client = session_factory().client('ec2')
+        instances = client.describe_instances(Filters=[
+            {
+                "Name": 'instance-state-name',
+                "Values": [
+                    "running"
+                ]
+            }
+        ])
+        self.assertEqual(len(instances['Reservations'][0]['Instances']), 1)
+        used_key = {instances['Reservations'][0]['Instances'][0]['KeyName']}
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        unused_key = keys - used_key
+        self.assertEqual(len(unused_key), 1)
+        self.assertNotEqual(unused_key, used_key)
+        p = self.load_policy(
+            {
+                "name": "unused-keys",
+                "resource": "aws.key-pair",
+                "filters": [
+                    {
+                        "type": "unused"
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "delete"
+                    },
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        self.assertIn(resources[0]['KeyName'], unused_key)
+        self.assertNotEqual(unused_key, keys)
+        self.assertEqual(used_key, keys)
+
+    def test_vpc_unused_key_not_filtered_error(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-unused-keys",
+                    "resource": "aws.key-pair",
+                    "actions": [
+                        {
+                            "type": "delete"
+                        },
+                    ]
+                }
+            )
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-unused-keys",
+                    "resource": "aws.key-pair",
+                    "filters": [
+                        {
+                            "type": "unused",
+                            "state": False
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete"
+                        },
+                    ]
+                }
+            )
