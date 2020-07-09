@@ -3245,6 +3245,55 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 return True
 
 
+@filters.register('has-data')
+class BucketHasData(BucketFilterBase):
+    """Filters for S3 buckets that are not empty
+
+    :example
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-buckets-with-data
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: has-data
+    """
+    schema = type_schema('has-data')
+
+    permissions = ('s3:ListBucket')
+
+    def process(self, buckets, event=None):
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(),
+                                   b['Name'])
+                    continue
+                if future.result():
+                    results.append(b)
+        return results
+
+    def process_bucket(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        try:
+            bucket_objects = client.list_objects_v2(
+                Bucket=b['Name'],
+                MaxKeys=1,
+            )
+            if bucket_objects.get("Contents"):
+                return True
+            else:
+                return False
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning("Access Denied Bucket:%s while applying has-data filter" % b['Name'])
+
+
 @actions.register('set-bucket-encryption')
 class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     """Action enables default encryption on S3 buckets
