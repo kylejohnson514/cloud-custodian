@@ -3245,7 +3245,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 return True
 
 
-@filters.register('has-data')
+@S3.filter_registry.register('has-data')
 class BucketHasData(BucketFilterBase):
     """Filters for S3 buckets that are not empty
 
