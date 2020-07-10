@@ -3261,7 +3261,6 @@ class BucketHasData(BucketFilterBase):
                   - type: has-data
     """
     schema = type_schema('has-data')
-
     permissions = ('s3:ListBucket')
 
     def process(self, buckets, event=None):
