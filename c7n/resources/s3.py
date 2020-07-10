@@ -3256,7 +3256,6 @@ class BucketHasData(BucketFilterBase):
             policies:
               - name: s3-buckets-with-data
                 resource: s3
-                region: us-east-1
                 filters:
                   - type: has-data
     """
@@ -3280,11 +3279,12 @@ class BucketHasData(BucketFilterBase):
     def process_bucket(self, b):
         client = bucket_client(local_session(self.manager.session_factory), b)
         try:
-            bucket_objects = client.list_objects_v2(
+            bucket_object = client.list_objects_v2(
                 Bucket=b['Name'],
                 MaxKeys=1,
             )
-            if bucket_objects.get("Contents"):
+
+            if bucket_object.get("Contents"):
                 return True
             else:
                 return False

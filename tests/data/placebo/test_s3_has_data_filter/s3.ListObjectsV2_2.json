@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "Name": "s3-bucket-test-has-data-false",
+        "Prefix": "",
+        "MaxKeys": 1,
+        "EncodingType": "url",
+        "KeyCount": 0
+    }
+}

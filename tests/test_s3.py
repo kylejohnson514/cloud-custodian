@@ -3541,6 +3541,21 @@ class S3Test(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
 
+    def test_s3_has_data_filter(self):
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_has_data_filter")
+
+        p = self.load_policy(
+            {
+                "name": "s3-has-data-filter-test",
+                "resource": "s3",
+                "filters": [{"type": "has-data"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class S3LifecycleTest(BaseTest):
 

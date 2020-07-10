@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "Contents": [
+            {
+                "Key": "test_data.txt",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 11,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "ETag": "\"cca8155b2ea01c53dfe5fbe00b1e2222\"",
+                "Size": 25,
+                "StorageClass": "STANDARD"
+            }
+        ],
+        "Name": "s3-bucket-test-has-data-true",
+        "Prefix": "",
+        "MaxKeys": 1,
+        "EncodingType": "url",
+        "KeyCount": 1
+    }
+}
