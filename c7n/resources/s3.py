@@ -3245,7 +3245,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 return True
 
 
-@S3.filter_registry.register('has-data')
+@filters.register('has-data')
 class BucketHasData(BucketFilterBase):
     """Filters for S3 buckets that are not empty
 
@@ -3260,7 +3260,7 @@ class BucketHasData(BucketFilterBase):
                   - type: has-data
     """
     schema = type_schema('has-data')
-    permissions = ('s3:ListBucket')
+    permissions = ('s3:ListBucket',)
 
     def process(self, buckets, event=None):
         results = []
