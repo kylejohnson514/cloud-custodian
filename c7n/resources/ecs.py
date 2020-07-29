@@ -495,6 +495,65 @@ class TaskDefinition(query.QueryResourceManager):
         return results
 
 
+@TaskDefinition.filter_registry.register('env-var')
+class TaskDefinitionEnvVariableFilter(Filter):
+    """Filter task definitions by the values stored in
+    the task definition's environment variables.
+
+    :Example:
+
+     Filter all task definitions with the env variable
+     ECS_AWSVPC_BLOCK_IMDS set to true
+
+    .. code-block:: yaml
+
+       policies:
+         - name: validate-awsvpc-block-imds-true
+           resource: ecs-task-definition
+           filters:
+             - type: env-var
+               value: ECS_AWSVPC_BLOCK_IMDS
+               key: true
+               op: equal
+    """
+    schema = type_schema(
+        'env-var',
+        **{
+            'type': 'env-var',
+            'additionalProperties': False,
+            'required': ['type'],
+            'properties': {
+                'type': {'enum': ['value']},
+                'key': {'type': 'string'},
+                'value': {'$ref': '#/definitions/filters_common/value'},
+                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+            }
+        }
+    )
+
+    permissions = ('ecs:DescribeTaskDefinition',
+                   'ecs:ListTaskDefinitions')
+    related_key = 'taskDefinitionArn'
+
+    def process(self, resources, event=None):
+        filtered = [r for r in resources if self.check_match(r)]
+        return filtered
+
+    def check_match(self, r):
+        env_var_key = self.data.get('key')
+        env_var_value = self.data.get('value')
+
+        container = r.get('containerDefinitions', [])
+        c_maps = container[0]
+        env_vars = c_maps.get('environment', [])
+
+        for entry in env_vars:
+            if entry['name'] == env_var_key:
+                if entry['value'] == env_var_value:
+                    return True
+        return False
+
+
 @TaskDefinition.action_registry.register('delete')
 class DeleteTaskDefinition(BaseAction):
     """Delete/DeRegister a task definition.

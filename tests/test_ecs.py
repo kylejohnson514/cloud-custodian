@@ -298,6 +298,24 @@ class TestEcsTaskDefinition(BaseTest):
                     resourceArn=resources[0]["taskDefinitionArn"]).get("tags")}
         self.assertEqual(tags, {"TestKey": "TestValue", "c7n-tag": "present"})
 
+    def test_task_env_var_filter(self):
+        session_factory = self.replay_flight_data("test_ecs_env_var_filter")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-env-var-filter",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"type": "env-var",
+                    "key": "TestTrueEnvVar",
+                    "value": "true",
+                    "op": "equal"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEcsTask(BaseTest):
 
