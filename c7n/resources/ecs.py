@@ -526,7 +526,8 @@ class TaskDefinitionEnvVariableFilter(Filter):
                 'type': {'enum': ['value']},
                 'key': {'type': 'string'},
                 'value': {'$ref': '#/definitions/filters_common/value'},
-                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+                # op fields supports 'eq'/'equal' and 'ne'/'not-equal'
+                'op': {'type': 'string'}
             }
         }
     )
@@ -542,15 +543,21 @@ class TaskDefinitionEnvVariableFilter(Filter):
     def check_match(self, r):
         env_var_key = self.data.get('key')
         env_var_value = self.data.get('value')
+        op = self.data.get('op')
 
         container = r.get('containerDefinitions', [])
         c_maps = container[0]
         env_vars = c_maps.get('environment', [])
 
         for entry in env_vars:
-            if entry['name'] == env_var_key:
-                if entry['value'] == env_var_value:
-                    return True
+            if op == 'eq' or op == 'equal':
+                if entry['name'] == env_var_key:
+                    if entry['value'] == env_var_value:
+                        return True
+            if op == 'ne' or op == 'not-equal':
+                if entry['name'] == env_var_key:
+                    if entry['value'] != env_var_value:
+                        return True
         return False
 
 

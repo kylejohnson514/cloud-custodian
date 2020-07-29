@@ -302,13 +302,29 @@ class TestEcsTaskDefinition(BaseTest):
         session_factory = self.replay_flight_data("test_ecs_env_var_filter")
         p = self.load_policy(
             {
-                "name": "test-ecs-env-var-filter",
+                "name": "test-ecs-env-var-eq-filter",
                 "resource": "ecs-task-definition",
                 "filters": [
                     {"type": "env-var",
                     "key": "TestTrueEnvVar",
                     "value": "true",
                     "op": "equal"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "test-ecs-env-var-ne-filter",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"type": "env-var",
+                    "key": "TestTrueEnvVar",
+                    "value": "true",
+                    "op": "not-equal"}
                 ],
             },
             session_factory=session_factory,

@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:012345678910:task-definition/test-ecs-env-vars-match:1",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:012345678910:task-definition/test-ecs-env-vars-match:2",
             "containerDefinitions": [
                 {
                     "name": "test-container",
@@ -20,11 +20,11 @@
                     "environment": [
                         {
                             "name": "TestTrueEnvVar",
-                            "value": "true"
+                            "value": "false"
                         },
                         {
                             "name": "TestFalseEnvVar",
-                            "value": "false"
+                            "value": "true"
                         }
                     ],
                     "mountPoints": [],
