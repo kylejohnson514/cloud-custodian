@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 import json
 import fnmatch
@@ -922,6 +912,15 @@ class PolicyConditions:
         self.policy = policy
         self.data = data
         self.filters = self.data.get('conditions', [])
+        # for value_from usage / we use the conditions class
+        # to mimic a resource manager interface. we can't use
+        # the actual resource manager as we're overriding block
+        # filters which work w/ resource type metadata and our
+        # resource here is effectively the execution variables.
+        self.config = self.policy.options
+        rm = self.policy.resource_manager
+        self._cache = rm._cache
+        self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
 
