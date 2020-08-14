@@ -33,7 +33,7 @@ from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
-from c7n.resolver import ValuesFrom
+from c7n.resolver import ValuesFrom, ValuesFromList
 from c7n.utils import set_annotation, type_schema, parse_cidr
 from c7n.manager import iter_filters
 
@@ -414,6 +414,7 @@ class ValueFilter(Filter):
             'default': {'type': 'object'},
             'value_regex': {'type': 'string'},
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+            'value_from_list': {'$ref': '#/definitions/filters_common/value_from_list'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
         }
@@ -471,6 +472,7 @@ class ValueFilter(Filter):
                 "Missing 'key' in value filter %s" % self.data)
         if ('value' not in self.data and
                 'value_from' not in self.data and
+                'value_from_list' not in self.data and
                 'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
@@ -556,7 +558,10 @@ class ValueFilter(Filter):
 
         if 'value_regex' in self.data:
             regex = ValueRegex(self.data['value_regex'])
+            print(f"\nRegex we are trying to match on: {regex}\n")
             r = regex.get_resource_value(r)
+            print(f"\nRetrieved regex value we are trying to match on: {r}\n")
+            print(f"\nData type of regex value we are trying to match on: {type(r)}")
         return r
 
     def match(self, i):
@@ -567,6 +572,9 @@ class ValueFilter(Filter):
             self.op = self.data.get('op')
             if 'value_from' in self.data:
                 values = ValuesFrom(self.data['value_from'], self.manager)
+                self.v = values.get_values()
+            elif 'value_from_list' in self.data:
+                values = ValuesFromList(self.data['value_from_list'], self.manager)
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
@@ -811,8 +819,10 @@ class ValueRegex:
             return resource
         try:
             capture = re.match(self.expr, resource)
+            print(f"\nResult from running re.match() on the expr and resource: {capture}")
         except (ValueError, TypeError):
             return None
         if capture is None:  # regex didn't capture anything
+            print(f"\nFailure -- regex did not capture anything\n")
             return None
         return capture.group(1)

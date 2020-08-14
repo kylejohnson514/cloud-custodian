@@ -193,3 +193,76 @@ class ValuesFrom:
             return data
         elif format == 'txt':
             return [s.strip() for s in io.StringIO(contents).readlines()]
+
+
+class ValuesFromList(ValuesFrom):
+
+    def get_values(self):
+        if self.cache:
+            # use these values as a key to cache the result so if we have
+            # the same filter happening across many resources, we can reuse
+            # the results.
+            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
+            contents = self.cache.get(("value-from-list", key))
+            if contents is not None:
+                return contents
+
+        contents_list = self._get_values()
+        print(f"Data type retrieved from _get_values(): {type(contents_list)}")
+        contents = set(contents_list)
+
+        # print(f"Data type of data retrieved from .txt file: {type(contents)}")
+        if self.cache:
+            self.cache.save(("value-from-list", key), contents)
+
+        # print(f"Value of the contents retrieved: {contents}")
+        return contents
+
+    def _get_values(self):
+        # we just want to make sure this returns a list
+        contents, format = self.get_contents()
+
+        if format == 'json':
+            data = json.loads(contents)
+            if 'expr' in self.data:
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return res
+        elif format == 'csv' or format == 'csv2dict':
+            data = csv.reader(io.StringIO(contents))
+            if format == 'csv2dict':
+                data = {x[0]: list(x[1:]) for x in zip(*data)}
+            else:
+                if isinstance(self.data.get('expr'), int):
+                    return [d[self.data['expr']] for d in data]
+                data = list(data)
+            if 'expr' in self.data:
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return res
+            return data
+        elif format == 'txt':
+            return [s.strip() for s in io.StringIO(contents).readlines()]
+
+    def get_contents(self):
+        _, format = os.path.splitext(self.data['url'])
+
+        if not format or self.data.get('format'):
+            format = self.data.get('format', '')
+        else:
+            format = format[1:]
+
+        if format not in self.supported_formats:
+            raise ValueError(
+                "Unsupported format %s for url %s",
+                format, self.data['url'])
+        # print(f"Value of data format for value_from filter: {format}")
+        # if format == JSON -> parse to dict do normal lookup
+
+        # OR, if we can, parse into a set and do O(1) but this depends on the datatype..
+        # --> need to read in the JSON as a list and convert to set (possibly using jsonpickle module) and then do O(1) search on it?
+
+        contents = str(self.resolver.resolve(self.data['url']))
+        return contents, format
