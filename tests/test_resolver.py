@@ -13,7 +13,7 @@ from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
 from c7n.config import Config
-from c7n.resolver import ValuesFrom, URIResolver
+from c7n.resolver import ValuesFrom, ValuesFromList, URIResolver
 
 
 class FakeCache:
@@ -186,5 +186,104 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ["east-resource"])
         self.assertEqual(values.get_values(), ["east-resource"])
         self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(cache.saves, 1)
+        self.assertEqual(cache.gets, 3)
+
+
+class UrlValueFromListTest(BaseTest):
+
+    def setUp(self):
+        self.old_dir = os.getcwd()
+        os.chdir(tempfile.gettempdir())
+
+    def tearDown(self):
+        os.chdir(self.old_dir)
+
+    def get_values_from_list(self, data, content, cache=None):
+        config = Config.empty(account_id=ACCOUNT_ID)
+        mgr = Bag({"session_factory": None, "_cache": cache, "config": config})
+        values = ValuesFromList(data, mgr)
+        values.resolver = FakeResolver(content)
+        return values
+
+    def test_json_expr(self):
+        values = self.get_values_from_list(
+            {"url": "moon", "expr": "bean", "format": "json"},
+            json.dumps({"bean": ["lima", "magic", "lima"]}),
+        )
+        self.assertEqual(values.get_values(), {"lima", "magic"})
+
+    def test_invalid_format(self):
+        values = self.get_values_from_list({"url": "mars"}, "")
+        self.assertRaises(ValueError, values.get_values)
+
+    def test_txt(self):
+        with open("resolver_test.txt", "w") as out:
+            for i in ["a", "b", "c", "d"]:
+                out.write("%s\n" % i)
+        with open("resolver_test.txt", "rb") as out:
+            values = self.get_values_from_list({"url": "letters.txt"}, out.read())
+        os.remove("resolver_test.txt")
+        self.assertEqual(values.get_values(), {"a", "b", "c", "d"})
+
+    def test_csv_expr(self):
+        with open("test_expr.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_expr.csv", "rb") as out:
+            values = self.get_values_from_list(
+                {"url": "sun.csv", "expr": "[*][2]"}, out.read()
+            )
+        os.remove("test_expr.csv")
+        self.assertEqual(values.get_values(), {"2"})
+
+    def test_csv_expr_using_dict(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from_list(
+                {"url": "sun.csv", "expr": "bb", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        self.assertEqual(values.get_values(), {"1"})
+
+    def test_csv_column(self):
+        with open("test_column.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_column.csv", "rb") as out:
+            values = self.get_values_from_list({"url": "sun.csv", "expr": 1}, out.read())
+        os.remove("test_column.csv")
+        self.assertEqual(values.get_values(), {"1"})
+
+    def test_csv_raw(self):
+        with open("test_raw.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerows([range(3, 4) for r in range(5)])
+        with open("test_raw.csv", "rb") as out:
+            values = self.get_values_from_list({"url": "sun.csv"}, out.read())
+        os.remove("test_raw.csv")
+        self.assertEqual(values.get_values(), [["3"], ["3"], ["3"], ["3"], ["3"]])
+
+    def test_value_from_vars(self):
+        values = self.get_values_from_list(
+            {"url": "{account_id}", "expr": '["{region}"]', "format": "json"},
+            json.dumps({"us-east-1": "east-resource"}),
+        )
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
+
+    def test_value_from_caching(self):
+        cache = FakeCache()
+        values = self.get_values_from_list(
+            {"url": "", "expr": '["{region}"]', "format": "json"},
+            json.dumps({"us-east-1": "east-resource"}),
+            cache=cache,
+        )
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(cache.saves, 1)
         self.assertEqual(cache.gets, 3)

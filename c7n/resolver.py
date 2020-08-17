@@ -183,3 +183,88 @@ class ValuesFrom:
             return data
         elif format == 'txt':
             return [s.strip() for s in io.StringIO(contents).readlines()]
+
+
+class ValuesFromList(ValuesFrom):
+    """
+    An extension to value_from, value_from_list adds a quicker O(1) lookup
+    by converting lists into sets and speeding up the check to find if a
+    value_from match exists or not. In this filter, our look-up data is
+    converted to unique sets without any duplicates.
+
+    This improvement can be applied to line delimited .txt files where each
+    entry becomes inputted into a list. Further, this applies to JSON files
+    with `expr` lookups that lead to a list. value_from_list also improves
+    lookups on CSV files in which the `expr` is retrieving individual columns
+    with any number of rows contained in that column.
+
+    This improvement does not apply in cases of CSV lookups spanning multiple
+    columns. In these cases, we default to the original behavior used in the
+    value_from filter, and the lookup time is not improved.
+
+    Examples::
+      # .json file contains {"emails": ["email1", "email2"]}
+      value_from_list:
+         url: s3://bucket/xyz/owner_contact_emails.json
+         format: json
+         expr: emails
+
+      # .txt file contains email values each on their own new line
+      value_from_list:
+         url: s3://bucket/xyz/owner_contact_emails.txt
+         format: txt
+
+      # in json file, where Region."us-east-1".ImageIds
+      # is the key that looks up an array of values
+      value_from_list:
+         url: http://foobar.com/mydata
+         format: json
+         expr: Region."us-east-1".ImageIds
+
+      # check value_from_list on column index 1 in CSV file
+      value_from_list:
+         url: s3://bucket/abc/foo.csv
+         format: csv2dict
+         expr: 1
+
+       # inferred from extension
+       format: [json, csv, csv2dict, txt]
+    """
+    def get_values(self):
+        if self.cache:
+            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
+            contents = self.cache.get(("value-from-list", key))
+            if contents is not None:
+                return contents
+
+        contents = self._get_values()
+        if self.cache:
+            self.cache.save(("value-from-list", key), contents)
+        return contents
+
+    def _get_values(self):
+        contents, format = self.get_contents()
+
+        if format == 'json':
+            data = json.loads(contents)
+            if 'expr' in self.data:
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return set(res)
+        elif format == 'csv' or format == 'csv2dict':
+            data = csv.reader(io.StringIO(contents))
+            if format == 'csv2dict':
+                data = {x[0]: set(x[1:]) for x in zip(*data)}
+            else:
+                if isinstance(self.data.get('expr'), int):
+                    return set([d[self.data['expr']] for d in data])
+                data = list(data)
+            if 'expr' in self.data:
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return set(res)
+            return data
+        elif format == 'txt':
+            return set([s.strip() for s in io.StringIO(contents).readlines()])

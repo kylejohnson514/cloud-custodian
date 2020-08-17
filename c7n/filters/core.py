@@ -24,7 +24,7 @@ from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
-from c7n.resolver import ValuesFrom
+from c7n.resolver import ValuesFrom, ValuesFromList
 from c7n.utils import set_annotation, type_schema, parse_cidr
 from c7n.manager import iter_filters
 
@@ -442,6 +442,7 @@ class ValueFilter(BaseValueFilter):
             'default': {'type': 'object'},
             'value_regex': {'type': 'string'},
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+            'value_from_list': {'$ref': '#/definitions/filters_common/value_from_list'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
         }
@@ -495,6 +496,7 @@ class ValueFilter(BaseValueFilter):
                 "Missing 'key' in value filter %s" % self.data)
         if ('value' not in self.data and
                 'value_from' not in self.data and
+                'value_from_list' not in self.data and
                 'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
@@ -564,6 +566,9 @@ class ValueFilter(BaseValueFilter):
             self.op = self.data.get('op')
             if 'value_from' in self.data:
                 values = ValuesFrom(self.data['value_from'], self.manager)
+                self.v = values.get_values()
+            elif 'value_from_list' in self.data:
+                values = ValuesFromList(self.data['value_from_list'], self.manager)
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
