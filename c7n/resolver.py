@@ -251,7 +251,7 @@ class ValuesFromList(ValuesFrom):
             if 'expr' in self.data:
                 res = jmespath.search(self.data['expr'], data)
                 if res is None:
-                    log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
+                    log.warning(f"ValueFromList filter: {self.data['expr']} key returned None")
                 return set(res)
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
@@ -260,7 +260,7 @@ class ValuesFromList(ValuesFrom):
                 if 'expr' in self.data:
                     res = jmespath.search(self.data['expr'], data)
                     if res is None:
-                        log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
+                        log.warning(f"ValueFromList filter: {self.data['expr']} key returned None")
                     return res
                 else:
                     # if using csv2dict and don't specify a column to retrieve via expr
@@ -274,7 +274,7 @@ class ValuesFromList(ValuesFrom):
                 if 'expr' in self.data:
                     res = jmespath.search(self.data['expr'], data)
                     if res is None:
-                        log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
+                        log.warning(f"ValueFromList filter: {self.data['expr']} key returned None")
                     return set(res)
 
                 set_combined_data = set(itertools.chain.from_iterable(data))
