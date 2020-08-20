@@ -280,3 +280,25 @@ class UrlValueFromListTest(BaseTest):
         os.remove("test_raw.csv")
         # previously expected this to be [["3"], ["3"], ["3"], ["3"], ["3"]]
         self.assertEqual(values.get_values(), {"3"})
+
+
+    def test_value_from_vars(self):
+        values = self.get_values_from_list(
+            {"url": "{account_id}", "expr": '["{region}"]', "format": "json"},
+            json.dumps({"us-east-1": "east-resource"}),
+        )
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
+
+    def test_value_from_caching(self):
+        cache = FakeCache()
+        values = self.get_values_from_list(
+            {"url": "", "expr": '["{region}"]', "format": "json"},
+            json.dumps({"us-east-1": "east-resource"}),
+            cache=cache,
+        )
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(cache.saves, 1)
+        self.assertEqual(cache.gets, 3)
