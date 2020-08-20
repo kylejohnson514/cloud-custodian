@@ -281,7 +281,6 @@ class UrlValueFromListTest(BaseTest):
         # previously expected this to be [["3"], ["3"], ["3"], ["3"], ["3"]]
         self.assertEqual(values.get_values(), {"3"})
 
-
     def test_value_from_vars(self):
         values = self.get_values_from_list(
             {"url": "{account_id}", "expr": '["{region}"]', "format": "json"},
