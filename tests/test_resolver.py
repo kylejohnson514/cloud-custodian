@@ -191,7 +191,6 @@ class UrlValueTest(BaseTest):
 
 
 class UrlValueFromListTest(BaseTest):
-
     def setUp(self):
         self.old_dir = os.getcwd()
         os.chdir(tempfile.gettempdir())
@@ -208,10 +207,10 @@ class UrlValueFromListTest(BaseTest):
 
     def test_json_expr(self):
         values = self.get_values_from_list(
-            {"url": "moon", "expr": "bean", "format": "json"},
-            json.dumps({"bean": ["lima", "magic", "lima"]}),
+            {"url": "moon", "expr": "[].bean", "format": "json"},
+            json.dumps([{"bean": "magic"}]),
         )
-        self.assertEqual(values.get_values(), {"lima", "magic"})
+        self.assertEqual(values.get_values(), {"magic"})
 
     def test_invalid_format(self):
         values = self.get_values_from_list({"url": "mars"}, "")
@@ -244,10 +243,24 @@ class UrlValueFromListTest(BaseTest):
             writer.writerows([range(5) for r in range(5)])
         with open("test_dict.csv", "rb") as out:
             values = self.get_values_from_list(
-                {"url": "sun.csv", "expr": "bb", "format": "csv2dict"}, out.read()
+                {"url": "sun.csv", "expr": "bb[1]", "format": "csv2dict"}, out.read()
             )
         os.remove("test_dict.csv")
-        self.assertEqual(values.get_values(), {"1"})
+        self.assertEqual(values.get_values(), "1")
+
+    def test_csv2dict_without_expr(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from_list(
+                {"url": "sun.csv", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        # data retrieved from csv dict looks like...
+        # {'aa': ['0', '0', '0', '0'], 'bb': ['1', '1', '1', '1'], ... 'ee': ['4', ... , '4']}
+        self.assertEqual(values.get_values(), {'0', '1', '2', '3', '4'})
 
     def test_csv_column(self):
         with open("test_column.csv", "w") as out:
@@ -265,25 +278,5 @@ class UrlValueFromListTest(BaseTest):
         with open("test_raw.csv", "rb") as out:
             values = self.get_values_from_list({"url": "sun.csv"}, out.read())
         os.remove("test_raw.csv")
-        self.assertEqual(values.get_values(), [["3"], ["3"], ["3"], ["3"], ["3"]])
-
-    def test_value_from_vars(self):
-        values = self.get_values_from_list(
-            {"url": "{account_id}", "expr": '["{region}"]', "format": "json"},
-            json.dumps({"us-east-1": "east-resource"}),
-        )
-        self.assertEqual(values.get_values(), {"east-resource"})
-        self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
-
-    def test_value_from_caching(self):
-        cache = FakeCache()
-        values = self.get_values_from_list(
-            {"url": "", "expr": '["{region}"]', "format": "json"},
-            json.dumps({"us-east-1": "east-resource"}),
-            cache=cache,
-        )
-        self.assertEqual(values.get_values(), {"east-resource"})
-        self.assertEqual(values.get_values(), {"east-resource"})
-        self.assertEqual(values.get_values(), {"east-resource"})
-        self.assertEqual(cache.saves, 1)
-        self.assertEqual(cache.gets, 3)
+        # previously expected this to be [["3"], ["3"], ["3"], ["3"], ["3"]]
+        self.assertEqual(values.get_values(), {"3"})

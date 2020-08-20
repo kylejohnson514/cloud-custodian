@@ -7,6 +7,7 @@ import jmespath
 import json
 import os.path
 import logging
+import itertools
 from urllib.request import Request, urlopen
 from urllib.parse import parse_qsl, urlparse
 import zlib
@@ -255,16 +256,28 @@ class ValuesFromList(ValuesFrom):
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
-                data = {x[0]: set(x[1:]) for x in zip(*data)}
+                data = {x[0]: list(x[1:]) for x in zip(*data)}
+                if 'expr' in self.data:
+                    res = jmespath.search(self.data['expr'], data)
+                    if res is None:
+                        log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
+                    return res
+                else:
+                    # if using csv2dict and don't specify a column to retrieve via expr
+                    # we retrieve all values in the dict, union them all into a set, and return
+                    set_combined_data = set(itertools.chain.from_iterable(data.values()))
+                    return set_combined_data
             else:
                 if isinstance(self.data.get('expr'), int):
                     return set([d[self.data['expr']] for d in data])
                 data = list(data)
-            if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
-                return set(res)
-            return data
+                if 'expr' in self.data:
+                    res = jmespath.search(self.data['expr'], data)
+                    if res is None:
+                        log.warning('ValueFromList filter: %s key returned None' % self.data['expr'])
+                    return set(res)
+
+                set_combined_data = set(itertools.chain.from_iterable(data))
+                return set_combined_data
         elif format == 'txt':
             return set([s.strip() for s in io.StringIO(contents).readlines()])
