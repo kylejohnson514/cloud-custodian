@@ -195,7 +195,8 @@ class ValuesFrom:
                     if isinstance(res, list):
                         res = set(res)
                     return res
-            combined_data = set(itertools.chain.from_iterable(data))
-            return combined_data
+                else:
+                    combined_data = set(itertools.chain.from_iterable(data))
+                    return combined_data
         elif format == 'txt':
             return set([s.strip() for s in io.StringIO(contents).readlines()])
