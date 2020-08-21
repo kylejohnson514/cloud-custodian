@@ -167,6 +167,8 @@ class ValuesFrom:
                 res = jmespath.search(self.data['expr'], data)
                 if res is None:
                     log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                if isinstance(res, list):
+                    res = set(res)
                 return set(res)
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
@@ -176,6 +178,8 @@ class ValuesFrom:
                     res = jmespath.search(self.data['expr'], data)
                     if res is None:
                         log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
+                    if isinstance(res, list):
+                        res = set(res)
                     return res
                 else:
                     combined_data = set(itertools.chain.from_iterable(data.values()))
@@ -188,7 +192,9 @@ class ValuesFrom:
                     res = jmespath.search(self.data['expr'], data)
                     if res is None:
                         log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
-                    return set(res)
+                    if isinstance(res, list):
+                        res = set(res)
+                    return res
             combined_data = set(itertools.chain.from_iterable(data))
             return combined_data
         elif format == 'txt':
