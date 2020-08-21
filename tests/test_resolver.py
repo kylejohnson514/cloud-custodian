@@ -107,6 +107,20 @@ class UrlValueTest(BaseTest):
         values.resolver = FakeResolver(content)
         return values
 
+    def test_none_json_expr(self):
+        values = self.get_values_from(
+            {"url": "moon", "expr": "mars", "format": "json"},
+            json.dumps([{"bean": "magic"}]),
+        )
+        self.assertEqual(values.get_values(), None)
+
+    def test_empty_json_expr(self):
+        values = self.get_values_from(
+            {"url": "moon", "expr": "[].mars", "format": "json"},
+            json.dumps([{"bean": "magic"}]),
+        )
+        self.assertEqual(values.get_values(), set())
+
     def test_json_expr(self):
         values = self.get_values_from(
             {"url": "moon", "expr": "[].bean", "format": "json"},
@@ -138,6 +152,17 @@ class UrlValueTest(BaseTest):
         os.remove("test_expr.csv")
         self.assertEqual(values.get_values(), {"2"})
 
+    def test_csv_none_expr(self):
+        with open("test_expr.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_expr.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "expr": "DNE"}, out.read()
+            )
+        os.remove("test_expr.csv")
+        self.assertEqual(values.get_values(), None)
+
     def test_csv_expr_using_dict(self):
         with open("test_dict.csv", "w") as out:
             writer = csv.writer(out)
@@ -149,6 +174,30 @@ class UrlValueTest(BaseTest):
             )
         os.remove("test_dict.csv")
         self.assertEqual(values.get_values(), "1")
+
+    def test_csv_none_expr_using_dict(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "expr": "ff", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        self.assertEqual(values.get_values(), None)
+
+    def test_csv_no_expr_using_dict(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        self.assertEqual(values.get_values(), {"0", "1", "2", "3", "4"})
 
     def test_csv_column(self):
         with open("test_column.csv", "w") as out:
