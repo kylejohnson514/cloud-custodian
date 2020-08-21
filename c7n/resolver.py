@@ -169,7 +169,7 @@ class ValuesFrom:
                     log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
                 if isinstance(res, list):
                     res = set(res)
-                return set(res)
+                return res
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
