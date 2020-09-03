@@ -94,6 +94,11 @@ class PluginRegistry:
         if factory:
             return factory
 
+        print(f"\nRetrieving value 'name' of: {name}")
+        print(f"\nvalues in self._factories.items(): {self._factories.items()}")
+        for k, v in self._factories.items():
+            print(f"\nvalues in v.type_aliases: {v.type_aliases}")
+
         return next((v for k, v in self._factories.items()
                      if v.type_aliases and name in v.type_aliases),
                     None)

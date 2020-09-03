@@ -245,23 +245,38 @@ class DescribeSource:
         return perms
 
     def augment(self, resources):
+        print(f"\nResources retrieved in DescribeSource augment: {resources}")
         model = self.manager.get_model()
         if getattr(model, 'detail_spec', None):
             detail_spec = getattr(model, 'detail_spec', None)
+            print(f"\nRetrieved from detail_spec values: {detail_spec}")
             _augment = _scalar_augment
+            print(f"\nRetrieved _augment values: {_augment}")
         elif getattr(model, 'batch_detail_spec', None):
             detail_spec = getattr(model, 'batch_detail_spec', None)
+            print(f"\nRetrieved from batch_detail_spec values: {detail_spec}")
             _augment = _batch_augment
+            print(f"\nRetrieved _augment values: {_augment}")
         else:
+            print(f"\nRetrieved augment values without needing to call getattr. Returning with resources: {resources}")
             return resources
         _augment = functools.partial(
             _augment, self.manager, model, detail_spec)
-        with self.manager.executor_factory(
-                max_workers=self.manager.max_workers) as w:
-            results = list(w.map(
-                _augment, chunks(resources, self.manager.chunk_size)))
+        print(f"\nUpdated value of original scalar _augment is now: {_augment}")
+        with self.manager.executor_factory(max_workers=self.manager.max_workers) as w:
+            chunk_values = chunks(resources, self.manager.chunk_size)
+            for chunk in chunk_values:
+                print(f"\nRetrieved value from calling chunks(): {chunk}")
+            results = list(w.map(_augment, chunks(resources, self.manager.chunk_size)))
+            print(f"\nBroken results from here: {results}")
             return list(itertools.chain(*results))
-
+        # with self.manager.executor_factory(max_workers=self.manager.max_workers) as w:
+        #     chunk_values = chunks(resources, self.manager.chunk_size)
+        #     for chunk in chunk_values:
+        #         print(f"\nRetrieved value from calling chunks(): {chunk}")
+        #     results = list(w.map(_augment, chunk_values))
+        #     print(f"\nBroken results from here: {results}")
+        #     return list(itertools.chain(*results))
 
 @sources.register('describe-child')
 class ChildDescribeSource(DescribeSource):
@@ -546,6 +561,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         ie. we want tags by default (rds, elb), and policy, location, acl for
         s3 buckets.
         """
+        print(f"\nResources we've received in augment(): {resources}")
+        # print(f"\nResults from calling self.source.augment(resources): {self.source.augment(resources)}")
         return self.source.augment(resources)
 
     @property

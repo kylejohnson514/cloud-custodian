@@ -97,6 +97,7 @@ ResourceMap = {
     "aws.key-pair": "c7n.resources.vpc.KeyPair",
     "aws.kinesis": "c7n.resources.kinesis.KinesisStream",
     "aws.kinesis-analytics": "c7n.resources.kinesis.AnalyticsApp",
+    "aws.kinesis-analytics-v2": "c7n.resources.kinesis.AnalyticsAppV2",
     "aws.kms": "c7n.resources.kms.KeyAlias",
     "aws.kms-key": "c7n.resources.kms.Key",
     "aws.lambda": "c7n.resources.awslambda.AWSLambda",

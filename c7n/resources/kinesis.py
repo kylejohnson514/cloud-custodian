@@ -257,6 +257,25 @@ class AnalyticsApp(QueryResourceManager):
         'describe': DescribeApp
     }
 
+@resources.register('kinesis-analytics-v2')
+class AnalyticsAppV2(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "kinesisanalyticsv2"
+        enum_spec = ('list_applications', 'ApplicationSummaries', None)
+        detail_spec = ('describe_application', 'ApplicationName',
+                       'ApplicationName', 'ApplicationDetail')
+        name = "ApplicationName"
+        arn = id = "ApplicationARN"
+        arn_type = 'application'
+        universal_taggable = object()
+        cfn_type = 'AWS::KinesisAnalyticsv2::Application'
+
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeApp
+    }
+
 
 @AnalyticsApp.action_registry.register('delete')
 class AppDelete(Action):

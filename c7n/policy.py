@@ -279,6 +279,7 @@ class PullMode(PolicyExecutionMode):
             s = time.time()
             try:
                 resources = self.policy.resource_manager.resources()
+                print(f"\nRetrieved resources in policy.py: {resources}")
             except ResourceLimitExceeded as e:
                 self.policy.log.error(str(e))
                 self.policy.ctx.metrics.put_metric(

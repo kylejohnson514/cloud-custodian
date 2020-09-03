@@ -121,6 +121,7 @@ class ResourceManager:
     def get_model(self):
         """Returns the resource meta-model.
         """
+        print(f"\nretrieved resource type: {self.resource_type}")
         return self.query.resolve(self.resource_type)
 
     def iter_filters(self, block_end=False):
