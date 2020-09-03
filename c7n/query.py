@@ -267,16 +267,11 @@ class DescribeSource:
             chunk_values = chunks(resources, self.manager.chunk_size)
             for chunk in chunk_values:
                 print(f"\nRetrieved value from calling chunks(): {chunk}")
+
             results = list(w.map(_augment, chunks(resources, self.manager.chunk_size)))
             print(f"\nBroken results from here: {results}")
             return list(itertools.chain(*results))
-        # with self.manager.executor_factory(max_workers=self.manager.max_workers) as w:
-        #     chunk_values = chunks(resources, self.manager.chunk_size)
-        #     for chunk in chunk_values:
-        #         print(f"\nRetrieved value from calling chunks(): {chunk}")
-        #     results = list(w.map(_augment, chunk_values))
-        #     print(f"\nBroken results from here: {results}")
-        #     return list(itertools.chain(*results))
+
 
 @sources.register('describe-child')
 class ChildDescribeSource(DescribeSource):
