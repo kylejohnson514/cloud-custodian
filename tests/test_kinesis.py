@@ -226,7 +226,7 @@ class Kinesis(BaseTest):
         p = self.load_policy(
             {
                 "name": "kapp",
-                "resource": "kinesis-analytics",
+                "resource": "kinesis-analytics-v2",
                 # "filters": [{"ApplicationStatus": "RUNNING"}],
             },
             session_factory=factory,

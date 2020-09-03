@@ -701,6 +701,8 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
     client = local_session(manager.session_factory).client(
         model.service, region_name=manager.config.region)
+    print(f"\nTrying to make api call using detail_op {detail_op}, param_name {param_name}, ")
+    print(f"param_key {param_key}, detail_path {detail_path}, and service type {model.service}\n")
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
