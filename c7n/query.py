@@ -709,7 +709,10 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
         args = ()
     results = []
     for r in resource_set:
+        print(f"\nretrieved resource from _scalar_augment: {r}")
         kw = {param_name: param_key and r[param_key] or r}
+        print(f"\nAttempting to make API call with kw {kw}")
+        print(f"\nAttempting to make API call with args {args}")
         response = op(*args, **kw)
         if detail_path:
             response = response[detail_path]

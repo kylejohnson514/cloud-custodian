@@ -360,6 +360,7 @@ def get_retry(retry_codes=(), max_attempts=8, min_delay=1, log_retries=False):
         for idx, delay in enumerate(
                 backoff_delays(min_delay, max_delay, jitter=True)):
             try:
+                print(f"\nRetrying API call with args {args} and key vals {kw}")
                 return func(*args, **kw)
             except ClientError as e:
                 if e.response['Error']['Code'] in ignore_err_codes:
