@@ -214,6 +214,26 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q4 2020
+            'AwsApiGatewayRestApi',
+            'AwsApiGatewayStage',
+            'AwsApiGatewayV2Api',
+            'AwsApiGatewayV2Stage',
+            'AwsCertificateManagerCertificate',
+            'AwsCloudTrailTrail',
+            'AwsElbLoadBalancer',
+            'AwsIamGroup',
+            'AwsRedshiftCluster',
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
@@ -232,7 +252,6 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
-            'AWS::EC2::Host',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
@@ -632,6 +651,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
@@ -1205,7 +1225,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',
