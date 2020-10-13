@@ -164,12 +164,7 @@ class ValuesFrom:
         if format == 'json':
             data = json.loads(contents)
             if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
-                if isinstance(res, list):
-                    res = set(res)
-                return res
+                return self._get_resource_values(data)
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
@@ -189,14 +184,17 @@ class ValuesFrom:
                     return set([d[self.data['expr']] for d in data])
                 data = list(data)
                 if 'expr' in self.data:
-                    res = jmespath.search(self.data['expr'], data)
-                    if res is None:
-                        log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
-                    if isinstance(res, list):
-                        res = set(res)
-                    return res
+                    return self._get_resource_values(data)
                 else:
                     combined_data = set(itertools.chain.from_iterable(data))
                     return combined_data
         elif format == 'txt':
             return set([s.strip() for s in io.StringIO(contents).readlines()])
+
+    def _get_resource_values(self, data):
+        res = jmespath.search(self.data['expr'], data)
+        if res is None:
+            log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
+        if isinstance(res, list):
+            res = set(res)
+        return res
