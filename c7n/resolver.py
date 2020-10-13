@@ -170,12 +170,7 @@ class ValuesFrom:
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
                 if 'expr' in self.data:
-                    res = jmespath.search(self.data['expr'], data)
-                    if res is None:
-                        log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
-                    if isinstance(res, list):
-                        res = set(res)
-                    return res
+                    return self._get_resource_values(data)
                 else:
                     combined_data = set(itertools.chain.from_iterable(data.values()))
                     return combined_data
