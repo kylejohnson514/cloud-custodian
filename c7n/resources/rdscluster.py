@@ -138,18 +138,15 @@ class ClusterParameterGroupsFilter(ValueFilter):
         return ret_val
 
     def process(self, resources, event=None):
-        print(f"\nResources retrieved in db-cluster-parameter: {resources}")
         results = []
         paramcache = {}
 
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_cluster_parameters')
-        print(f"\nRetrieved paginator: {paginator}")
 
         param_groups = {db['DBClusterParameterGroup'] for db in resources}
 
         for pg in param_groups:
-            print(f"\nCurrently working on db cluster parameter group {pg}\n")
             cache_key = {
                 'region': self.manager.config.region,
                 'account_id': self.manager.config.account_id,
@@ -158,17 +155,8 @@ class ClusterParameterGroupsFilter(ValueFilter):
             if pg_values is not None:
                 paramcache[pg] = pg_values
                 continue
-
-            # param_list = list(itertools.chain(*[p['Parameters']
-            #                                     for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
-
-            # for p in paginator.paginate(DBClusterParameterGroupName=pg):
-            #     print(f"\nCurrently paginating over value: {p}")
-
             param_list = list(itertools.chain(*[p['Parameters']
                 for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
-
-            # print(f"\nRetrieved param_list values: {param_list}")
             paramcache[pg] = {
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
                 for p in param_list if 'ParameterValue' in p}
@@ -176,7 +164,6 @@ class ClusterParameterGroupsFilter(ValueFilter):
 
         for resource in resources:
             pg_values = paramcache[resource['DBClusterParameterGroup']]
-            print(f"\nSearching through pg_values: {pg_values}")
             if self.match(pg_values):
                 resource.setdefault('c7n:MatchedDBParameter', []).append(
                     self.data.get('key'))

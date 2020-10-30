@@ -1,0 +1,1380 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "hot_standby_feedback",
+                "ParameterValue": "on",
+                "Description": "Allows feedback from a hot standby to the primary that will avoid query conflicts.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "huge_pages",
+                "ParameterValue": "on",
+                "Description": "Use of huge pages on Linux.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "on,off",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ident_file",
+                "ParameterValue": "/rdsdbdata/config/pg_ident.conf",
+                "Description": "Sets the servers ident configuration file.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "idle_in_transaction_session_timeout",
+                "Description": "(ms) Sets the maximum allowed duration of any idling transaction.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "intervalstyle",
+                "Description": "Sets the display format for interval values.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "postgres,postgres_verbose,sql_standard,iso_8601",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "join_collapse_limit",
+                "Description": "Sets the FROM-list size beyond which JOIN constructs are not flattened.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "lc_messages",
+                "Description": "Sets the language in which messages are displayed.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "lc_monetary",
+                "Description": "Sets the locale for formatting monetary amounts.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "lc_numeric",
+                "Description": "Sets the locale for formatting numbers.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "lc_time",
+                "Description": "Sets the locale for formatting date and time values.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "listen_addresses",
+                "ParameterValue": "*",
+                "Description": "Sets the host name or IP address(es) to listen to.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "lo_compat_privileges",
+                "ParameterValue": "0",
+                "Description": "Enables backward compatibility mode for privilege checks on large objects.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_autovacuum_min_duration",
+                "Description": "(ms) Sets the minimum execution time above which autovacuum actions will be logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_connections",
+                "Description": "Logs each successful connection.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_destination",
+                "ParameterValue": "stderr",
+                "Description": "Sets the destination for server log output.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "stderr,csvlog",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_directory",
+                "ParameterValue": "/rdsdbdata/log/error",
+                "Description": "Sets the destination directory for log files.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_disconnections",
+                "Description": "Logs end of a session, including duration.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_duration",
+                "Description": "Logs the duration of each completed SQL statement.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_error_verbosity",
+                "Description": "Sets the verbosity of logged messages.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "terse,default,verbose",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_executor_stats",
+                "Description": "Writes executor performance statistics to the server log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_file_mode",
+                "ParameterValue": "0644",
+                "Description": "Sets the file permissions for log files.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_filename",
+                "ParameterValue": "postgresql.log.%Y-%m-%d-%H%M",
+                "Description": "Sets the file name pattern for log files.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "postgresql.log.%Y-%m-%d,postgresql.log.%Y-%m-%d-%H,postgresql.log.%Y-%m-%d-%H%M",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "logging_collector",
+                "ParameterValue": "1",
+                "Description": "Start a subprocess to capture stderr output and/or csvlogs into log files.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_hostname",
+                "ParameterValue": "off",
+                "Description": "Logs the host name in the connection logs.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_line_prefix",
+                "ParameterValue": "%t:%r:%u@%d:[%p]:",
+                "Description": "Controls information prefixed to each log line.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_lock_waits",
+                "Description": "Logs long lock waits.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_min_duration_statement",
+                "Description": "(ms) Sets the minimum execution time above which statements will be logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_min_error_statement",
+                "Description": "Causes all statements generating error at or above this level to be logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_min_messages",
+                "Description": "Sets the message levels that are logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_parser_stats",
+                "Description": "Writes parser performance statistics to the server log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_planner_stats",
+                "Description": "Writes planner performance statistics to the server log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_replication_commands",
+                "Description": "Logs each replication command.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_rotation_age",
+                "ParameterValue": "60",
+                "Description": "(min) Automatic log file rotation will occur after N minutes.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "10-1440",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_rotation_size",
+                "ParameterValue": "100000",
+                "Description": "(kB) Automatic log file rotation will occur after N kilobytes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "50000-1000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_statement",
+                "Description": "Sets the type of statements logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "none,ddl,mod,all",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_statement_stats",
+                "Description": "Writes cumulative performance statistics to the server log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_temp_files",
+                "Description": "(kB) Log the use of temporary files larger than this number of kilobytes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "log_timezone",
+                "ParameterValue": "UTC",
+                "Description": "Sets the time zone to use in log messages.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "log_truncate_on_rotation",
+                "ParameterValue": "0",
+                "Description": "Truncate existing log files of same name during log rotation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "maintenance_work_mem",
+                "ParameterValue": "GREATEST({DBInstanceClassMemory/63963136*1024},65536)",
+                "Description": "(kB) Sets the maximum memory to be used for maintenance operations.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_connections",
+                "ParameterValue": "LEAST({DBInstanceClassMemory/9531392},5000)",
+                "Description": "Sets the maximum number of concurrent connections.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "6-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_files_per_process",
+                "Description": "Sets the maximum number of simultaneously open files for each server process.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "35-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_locks_per_transaction",
+                "ParameterValue": "64",
+                "Description": "Sets the maximum number of locks per transaction.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "10-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_logical_replication_workers",
+                "Description": "Maximum number of logical replication worker processes.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_parallel_workers",
+                "Description": "Sets the maximum number of parallel workers than can be active at one time.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1024",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_parallel_workers_per_gather",
+                "Description": "Sets the maximum number of parallel processes per executor node.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1024",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_pred_locks_per_page",
+                "Description": "Sets the maximum number of predicate-locked tuples per page.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_pred_locks_per_relation",
+                "Description": "Sets the maximum number of predicate-locked pages and tuples per relation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-2147483648-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_pred_locks_per_transaction",
+                "Description": "Sets the maximum number of predicate locks per transaction.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "10-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_prepared_transactions",
+                "ParameterValue": "0",
+                "Description": "Sets the maximum number of simultaneously prepared transactions.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "max_replication_slots",
+                "ParameterValue": "10",
+                "Description": "Sets the maximum number of replication slots that the server can support.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "5-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_stack_depth",
+                "ParameterValue": "6144",
+                "Description": "(kB) Sets the maximum stack depth, in kilobytes.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "100-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_standby_archive_delay",
+                "Description": "(ms) Sets the maximum delay before canceling queries when a hot standby server is processing archived WAL data.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_standby_streaming_delay",
+                "Description": "(ms) Sets the maximum delay before canceling queries when a hot standby server is processing streamed WAL data.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_sync_workers_per_subscription",
+                "Description": "Maximum number of synchronization workers per subscription",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_wal_senders",
+                "ParameterValue": "10",
+                "Description": "Sets the maximum number of simultaneously running WAL sender processes.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "5-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "max_worker_processes",
+                "ParameterValue": "8",
+                "Description": "Sets the maximum number of concurrent worker processes.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "min_parallel_index_scan_size",
+                "Description": "(8kB) Sets the minimum amount of index data for a parallel scan.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-715827882",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "min_parallel_table_scan_size",
+                "Description": "(8kB) Sets the minimum amount of table data for a parallel scan.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-715827882",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "old_snapshot_threshold",
+                "Description": "(min) Time before a snapshot is too old to read pages changed after the snapshot was taken.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-86400",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "operator_precedence_warning",
+                "Description": "Emit a warning for constructs that changed meaning since PostgreSQL 9.4.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "orafce.nls_date_format",
+                "Description": "Emulate oracle's date output behaviour.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "orafce.timezone",
+                "Description": "Specify timezone used for sysdate function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "parallel_setup_cost",
+                "Description": "Sets the planner's estimate of the cost of starting up worker processes for parallel query.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1.79769e+308",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "parallel_tuple_cost",
+                "Description": "Sets the planner's estimate of the cost of passing each tuple (row) from worker to master backend.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1.79769e+308",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "password_encryption",
+                "ParameterValue": "md5",
+                "Description": "Encrypt passwords.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "md5",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log",
+                "Description": "Specifies which classes of statements will be logged by session audit logging.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "list",
+                "AllowedValues": "ddl,function,misc,read,role,write,none,all,-ddl,-function,-misc,-read,-role,-write",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log_catalog",
+                "Description": "Specifies that session logging should be enabled in the case where all relations in a statement are in pg_catalog.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log_level",
+                "Description": "Specifies the log level that will be used for log entries.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,log",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log_parameter",
+                "Description": "Specifies that audit logging should include the parameters that were passed with the statement.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log_relation",
+                "Description": "Specifies whether session audit logging should create a separate log entry for each relation (TABLE, VIEW, etc.) referenced in a SELECT or DML statement.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.log_statement_once",
+                "Description": "Specifies whether logging will include the statement text and parameters with the first log entry for a statement/substatement combination or with every entry.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pgaudit.role",
+                "Description": "Specifies the master role to use for object audit logging.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "rds_pgaudit",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_hint_plan.debug_print",
+                "Description": "Logs results of hint parsing.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "off,on,detailed,verbose",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_hint_plan.enable_hint",
+                "Description": "Force planner to use plans specified in the hint comment preceding to the query.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_hint_plan.enable_hint_table",
+                "Description": "Force planner to not get hint by using table lookups.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_hint_plan.message_level",
+                "Description": "Message level of debug messages.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,log,info,notice,warning,error",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_hint_plan.parse_messages",
+                "Description": "Message level of parse errors.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,log,info,notice,warning,error",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.batch_inserts",
+                "Description": "Batch inserts if possible",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.conflict_log_level",
+                "Description": "Sets log level used for logging resolved conflicts.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.conflict_resolution",
+                "Description": "Sets method used for conflict resolution for resolvable conflicts.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "error,apply_remote,keep_local,last_update_wins,first_update_wins",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.extra_connection_options",
+                "Description": "connection options to add to all peer node connections",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.synchronous_commit",
+                "Description": "pglogical specific synchronous commit value",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pglogical.use_spi",
+                "Description": "Use SPI instead of low-level API for applying changes",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.block_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.block_threshold",
+                "Description": "Sets the threshold used by the Block similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.block_tokenizer",
+                "Description": "Sets the tokenizer for Block similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_threshold",
+                "Description": "Sets the threshold used by the Cosine similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_tokenizer",
+                "Description": "Sets the tokenizer for Cosine similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.dice_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.dice_threshold",
+                "Description": "Sets the threshold used by the Dice similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.dice_tokenizer",
+                "Description": "Sets the tokenizer for Dice similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_threshold",
+                "Description": "Sets the threshold used by the Euclidean similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_tokenizer",
+                "Description": "Sets the tokenizer for Euclidean similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.hamming_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.hamming_threshold",
+                "Description": "Sets the threshold used by the Block similarity metric.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.jaccard_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "pg_similarity.jaccard_threshold",
+                "Description": "Sets the threshold used by the Jaccard similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            }
+        ],
+        "Marker": "cGdfc2ltaWxhcml0eS5qYWNjYXJkX3RocmVzaG9sZA==",
+        "ResponseMetadata": {}
+    }
+}

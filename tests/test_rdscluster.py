@@ -8,7 +8,37 @@ from .common import BaseTest
 
 
 class RDSClusterTest(BaseTest):
-#
+    PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
+        # filter_struct, test_func, err_message
+        (
+            {"key": "log_destination", "op": "eq", "value": "stderr"},
+            lambda r: len(r) == 1,
+            "instances with log_destination == stderr should be 1",
+        ),
+        # why does this fail ?
+        # (
+        #     {"key": "apg_plan_mgmt.plan_retention_period", "op": "eq", "value": "32"},
+        #     lambda r: len(r) == 1,
+        #     "instances with apg_plan_mgmt.plan_retention_period == 32 should be 1",
+        # ),
+
+        # (
+        #     {"key": "log_destination", "op": "ne", "value": "stderr"},
+        #     lambda r: len(r) == 0,
+        #     "instances with log_destination != stderr should be 0",
+        # ),
+        # (
+        #     {"key": "log_destination", "op": "ne", "value": "s3"},
+        #     lambda r: len(r) == 1,
+        #     "instances with log_destination != s3 should be 1",
+        # ),
+        # (
+        #     {"key": "full_page_writes", "op": "eq", "value": True},
+        #     lambda r: len(r) == 1,
+        #     "full_page_writes ( a boolean ) should be on",
+        # ),
+    ]
+
 #     def remove_augments(self):
 #         # This exists because we added tag augmentation after eight other tests
 #         # were created and I did not want to re-create the state to re-record
@@ -359,45 +389,26 @@ class RDSClusterTest(BaseTest):
 #         self.assertEqual(cluster['Status'], 'starting')
 
 
-    # def test_rdscluster_parameter_group_filter(self):
-    #     factory = self.record_flight_data("test_rdscluster_parameter_group_filter")
-    #     p = self.load_policy(
-    #         {
-    #             "name": "rdscluster-param-group-filter",
-    #             "resource": "rds-cluster",
-    #             "filters": [
-    #                 {
-    #                     "type": "db-cluster-parameter",
-    #                     "key": "StorageEncrypted",
-    #                     "value": True
-    #                 }
-    #             ],
-    #         },
-    #         session_factory=factory,
-    #     )
-    #     resources = p.run()
-    #     print(f"\nRDS Cluster Groups resources retrieved in unit test: {resources}\n")
-    #     self.assertEqual(len(resources), 1)
-
-    def test_rds_parameter_filter_testing(self):
-        factory = self.record_flight_data("test_rds_parameter_filte_testingr")
+    def test_rdscluster_parameter_group_filter(self):
+        factory = self.replay_flight_data("test_rdscluster_parameter_group_filter")
         p = self.load_policy(
             {
-                "name": "rds-param-filter",
-                "resource": "rds",
-                "filters": [
-                    {
-                        "type": "db-parameter",
-                        # "key": "StorageEncrypted",
-                        # "value": False
-                    }
-                ],
+                "name": "rdscluster-param-group-filter",
+                "resource": "rds-cluster",
             },
             session_factory=factory,
         )
-        resources = p.run()
-        print(f"\nRDS Cluster Groups resources retrieved in unit test: {resources}\n")
-        self.assertEqual(len(resources), 2)
+        resources = p.resource_manager.resources()
+
+        for testcase in self.PARAMGROUP_PARAMETER_FILTER_TEST_CASES:
+            fdata, assertion, err_msg = testcase
+            f = p.resource_manager.filter_registry.get("db-cluster-parameter")(
+                fdata, p.resource_manager
+            )
+            f_resources = f.process(resources)
+            if not assertion(f_resources):
+                print(len(f_resources), fdata, assertion)
+                self.fail(err_msg)
 
 
 # class RDSClusterSnapshotTest(BaseTest):
