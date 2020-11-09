@@ -110,7 +110,7 @@ class ClusterParameterGroupsFilter(ValueFilter):
 
     schema = type_schema('db-cluster-allowed-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('rds:DescribeDBInstances', 'rds:DescribeClusterParameterGroups', )
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBClusterParameterGroups', )
 
     def process(self, resources, event=None):
         results = []
