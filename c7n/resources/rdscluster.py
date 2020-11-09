@@ -99,7 +99,7 @@ class ClusterParameterGroupsFilter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: rds-pg
+              - name: neptune-clusters-enforce-ssl-required
                 resource: rds-cluster
                 filters:
                   - type: db-cluster-allowed-parameter
