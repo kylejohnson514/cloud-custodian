@@ -90,10 +90,10 @@ class SubnetFilter(net_filters.SubnetFilter):
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-@RDSCluster.filter_registry.register('db-cluster-parameter')
+@RDSCluster.filter_registry.register('db-cluster-allowed-parameter')
 class ClusterParameterGroupsFilter(ValueFilter):
     """
-    Applies value type filter on set db cluster parameter group values.
+    Applies value type filter on db cluster group's allowed values.
     :example:
 
     .. code-block:: yaml
@@ -102,40 +102,15 @@ class ClusterParameterGroupsFilter(ValueFilter):
               - name: rds-pg
                 resource: rds-cluster
                 filters:
-                  - type: db-cluster-parameter
-                    key: someparam
+                  - type: db-cluster-allowed-parameter
+                    key: neptune_enforce_ssl
                     op: eq
-                    value: someval
+                    value: 1
     """
 
-    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
+    schema = type_schema('db-cluster-allowed-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeClusterParameterGroups', )
-
-    @staticmethod
-    def recast(val, datatype):
-        """ Re-cast the value based upon an AWS supplied datatype
-            and treat nulls sensibly.
-        """
-        ret_val = val
-        if datatype == 'string':
-            ret_val = str(val)
-        elif datatype == 'boolean':
-            # AWS returns 1s and 0s for boolean for most of the cases
-            if val.isdigit():
-                ret_val = bool(int(val))
-            # AWS returns 'TRUE,FALSE' for Oracle engine
-            elif val == 'TRUE':
-                ret_val = True
-            elif val == 'FALSE':
-                ret_val = False
-        elif datatype == 'integer':
-            if val.isdigit():
-                ret_val = int(val)
-        elif datatype == 'float':
-            ret_val = float(val) if val else 0.0
-
-        return ret_val
 
     def process(self, resources, event=None):
         results = []
@@ -158,8 +133,8 @@ class ClusterParameterGroupsFilter(ValueFilter):
             param_list = list(itertools.chain(*[p['Parameters']
                 for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
             paramcache[pg] = {
-                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in param_list if 'ParameterValue' in p}
+                p['ParameterName']: p['AllowedValues']
+                for p in param_list if 'AllowedValues' in p}
             self.manager._cache.save(cache_key, paramcache[pg])
 
         for resource in resources:
@@ -168,7 +143,6 @@ class ClusterParameterGroupsFilter(ValueFilter):
                 resource.setdefault('c7n:MatchedDBParameter', []).append(
                     self.data.get('key'))
                 results.append(resource)
-                break
         return results
 
 
