@@ -8,6 +8,7 @@ from .common import BaseTest
 
 
 class RDSClusterTest(BaseTest):
+
     def remove_augments(self):
         # This exists because we added tag augmentation after eight other tests
         # were created and I did not want to re-create the state to re-record
@@ -356,7 +357,6 @@ class RDSClusterTest(BaseTest):
         cluster = client.describe_db_clusters(
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
-
 
     def test_rdscluster_allowed_parameter_group_filter(self):
         factory = self.replay_flight_data("test_rdscluster_allowed_parameter_group_filter")
