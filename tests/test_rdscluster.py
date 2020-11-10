@@ -358,8 +358,8 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
 
-    def test_rdscluster_allowed_parameter_group_filter(self):
-        factory = self.replay_flight_data("test_rdscluster_allowed_parameter_group_filter")
+    def test_rdscluster_parameter_group_filter(self):
+        factory = self.replay_flight_data("test_rdscluster_parameter_group_filter")
         p = self.load_policy(
             {
                 "name": "rdscluster-param-group-filter",
@@ -374,7 +374,7 @@ class RDSClusterTest(BaseTest):
                                 "op": "contains"
                             },
                             {
-                                "type": "db-cluster-allowed-parameter",
+                                "type": "db-cluster-parameter",
                                 "key": "neptune_enforce_ssl",
                                 "value": "1"
                             }

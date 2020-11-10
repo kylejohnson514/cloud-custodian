@@ -90,7 +90,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-@RDSCluster.filter_registry.register('db-cluster-allowed-parameter')
+@RDSCluster.filter_registry.register('db-cluster-parameter')
 class ClusterParameterGroupsFilter(ValueFilter):
     """
     Applies value type filter on db cluster group's allowed values.
@@ -102,13 +102,13 @@ class ClusterParameterGroupsFilter(ValueFilter):
               - name: neptune-clusters-enforce-ssl-required
                 resource: rds-cluster
                 filters:
-                  - type: db-cluster-allowed-parameter
+                  - type: db-cluster-parameter
                     key: neptune_enforce_ssl
                     op: eq
                     value: 1
     """
 
-    schema = type_schema('db-cluster-allowed-parameter', rinherit=ValueFilter.schema)
+    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBClusterParameterGroups', )
 
