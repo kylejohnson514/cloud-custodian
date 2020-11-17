@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.client import ClientError
@@ -603,7 +602,7 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        image = self.launch_info.get(i).get('ImageId', None)
+        image = self.images.get(self.launch_info.get(i).get('ImageId', None))
         # Finally, if we have no image...
         if not image:
             self.log.warning(

@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import OrderedDict
@@ -10,6 +9,7 @@ import io
 from datetime import timedelta
 import itertools
 import time
+from xml.etree import ElementTree
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
@@ -281,6 +281,10 @@ class UserRemoveTag(RemoveTag):
 
 User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+Role.action_registry.register('mark-for-op', TagDelayedAction)
+Role.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @User.action_registry.register('set-groups')
@@ -1072,6 +1076,16 @@ class RoleDelete(BaseAction):
     schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('iam:DeleteRole',)
 
+    def detach_inline_policies(self, client, r):
+        policies = (self.manager.retry(
+            client.list_role_policies, RoleName=r['RoleName'],
+            ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
+        for p in policies:
+            self.manager.retry(
+                client.delete_role_policy,
+                RoleName=r['RoleName'], PolicyName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         error = None
@@ -1079,7 +1093,10 @@ class RoleDelete(BaseAction):
             policy_setter = self.manager.action_registry['set-policy'](
                 {'state': 'detached', 'arn': '*'}, self.manager)
             policy_setter.process(resources)
+
         for r in resources:
+            if self.data.get('force', False):
+                self.detach_inline_policies(client, r)
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
@@ -1087,9 +1104,8 @@ class RoleDelete(BaseAction):
                     "Role:%s cannot be deleted, set force to detach policy and delete"
                     % r['Arn'])
                 error = e
-            except client.exceptions.NoSuchEntityException:
-                continue
-            except client.exceptions.UnmodifiableEntityException:
+            except (client.exceptions.NoSuchEntityException,
+                    client.exceptions.UnmodifiableEntityException):
                 continue
         if error:
             raise error
@@ -2202,3 +2218,137 @@ class IamGroupInlinePolicy(Filter):
             if len(r['c7n:InlinePolicies']) == 0 and not value:
                 res.append(r)
         return res
+
+
+@Group.action_registry.register('delete')
+class UserGroupDelete(BaseAction):
+    """Delete an IAM User Group.
+
+    For example, if you want to delete a group named 'test'.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-user-group
+          resource: aws.iam-group
+          filters:
+            - type: value
+              key: GroupName
+              value: test
+          actions:
+            - type: delete
+              force: True
+    """
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('iam:DeleteGroup', 'iam:RemoveUserFromGroup')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        error = None
+        force = self.data.get('force', False)
+        if force:
+            users = client.get_group(GroupName=r['GroupName']).get('Users', [])
+            for user in users:
+                client.remove_user_from_group(
+                    UserName=user['UserName'], GroupName=r['GroupName'])
+
+        try:
+            client.delete_group(GroupName=r['GroupName'])
+        except client.exceptions.DeleteConflictException as e:
+            self.log.warning(
+                ("Group:%s cannot be deleted, "
+                 "set force to remove all users from group")
+                % r['Arn'])
+            error = e
+        except (client.exceptions.NoSuchEntityException,
+                client.exceptions.UnmodifiableEntityException):
+            pass
+        if error:
+            raise error
+
+
+class SamlProviderDescribe(DescribeSource):
+
+    def augment(self, resources):
+        super().augment(resources)
+        for r in resources:
+            md = r.get('SAMLMetadataDocument')
+            if not md:
+                continue
+            root = sso_metadata(md)
+            r['IDPSSODescriptor'] = root['IDPSSODescriptor']
+        return resources
+
+    def get_permissions(self):
+        return ('iam:GetSAMLProvider', 'iam:ListSAMLProviders')
+
+
+def sso_metadata(md):
+    root = ElementTree.fromstringlist(md)
+    d = {}
+    _sso_recurse(root, d)
+    return d
+
+
+def _sso_recurse(node, d):
+    d.update(node.attrib)
+    for c in node:
+        k = c.tag.split('}', 1)[-1]
+        cd = {}
+        if k in d:
+            if not isinstance(d[k], list):
+                d[k] = [d[k]]
+            d[k].append(cd)
+        else:
+            d[k] = cd
+        _sso_recurse(c, cd)
+    if node.text and node.text.strip():
+        d['Value'] = node.text.strip()
+
+
+@resources.register('iam-saml-provider')
+class SamlProvider(QueryResourceManager):
+    """SAML SSO Provider
+
+    we parse and expose attributes of the SAML Metadata XML Document
+    as resources attribute for use with custodian's standard value filter.
+    """
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_saml_providers', 'SAMLProviderList', None)
+        detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'saml-provider'
+        global_resource = True
+
+    source_mapping = {'describe': SamlProviderDescribe}
+
+
+class OpenIdDescribe(DescribeSource):
+
+    def get_permissions(self):
+        return ('iam:GetOpenIDConnectProvider', 'iam:ListOpenIDConnectProviders')
+
+
+@resources.register('iam-oidc-provider')
+class OpenIdProvider(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
+        detail_spec = ('get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'oidc-provider'
+        global_resource = True
+
+    source_mapping = {'describe': OpenIdDescribe}

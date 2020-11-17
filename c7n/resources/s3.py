@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """S3 Resource Manager
@@ -42,7 +41,6 @@ from botocore.exceptions import ClientError
 
 from collections import defaultdict
 from concurrent.futures import as_completed
-from dateutil.parser import parse as parse_date
 
 try:
     from urllib3.exceptions import SSLError
@@ -110,7 +108,6 @@ class ConfigS3(query.ConfigSource):
 
         # owner is under acl per describe
         resource.pop('Owner', None)
-        resource['CreationDate'] = parse_date(resource['CreationDate'])
 
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
             if cfg.get(k) == null_value:
@@ -282,13 +279,14 @@ class ConfigS3(query.ConfigSource):
         for rid, r in item_value['rules'].items():
             rule = {
                 'ID': rid,
-                'Status': r['status'],
-                'Prefix': r['prefix'],
+                'Status': r.get('status', ''),
+                'Prefix': r.get('prefix', ''),
                 'Destination': {
-                    'Account': r['destinationConfig']['Account'],
                     'Bucket': r['destinationConfig']['bucketARN']}
             }
-            if r['destinationConfig']['storageClass']:
+            if 'Account' in r['destinationConfig']:
+                rule['Destination']['Account'] = r['destinationConfig']['Account']
+            if r['destinationConfig'].get('storageClass'):
                 rule['Destination']['StorageClass'] = r['destinationConfig']['storageClass']
             d['Rules'].append(rule)
         resource['Replication'] = {'ReplicationConfiguration': d}
@@ -1547,7 +1545,7 @@ class ToggleVersioning(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] != 'AccessDenied':
                 log.error(
-                    "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
+                    "Unable to put bucket versioning on bucket %s: %s" % (resource['Name'], e))
                 raise
             log.warning(
                 "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])

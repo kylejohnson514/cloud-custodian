@@ -1,10 +1,10 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
+import random
 import unittest
 import os
 
@@ -1225,6 +1225,9 @@ class TestReduceFilter(BaseFilterTest):
                 "order": "randomize",
             }
         )
+        # Set the rand seed to ensure that the random sets aren't accidentally
+        # the same.
+        random.seed(1234)
         rs1 = f.process(resources)
         rs2 = f.process(resources)
         self.assertEqual(len(rs1), len(resources))
