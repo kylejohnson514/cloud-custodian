@@ -981,9 +981,6 @@ class CELFilter(Filter):
     """
     # expr = None
 
-    # figure out if we need this?
-    # think so for when we make the MixIn classes, this will designate
-    # this as the super class that we're extending
     def __init__(self, data, manager):
         # super(CELFilter, self).__init__(data, manager)
         super().__init__(data, manager)
