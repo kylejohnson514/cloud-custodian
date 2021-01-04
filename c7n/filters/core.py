@@ -27,6 +27,13 @@ from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
 from c7n.filters.offhours import ScheduleParser
 
+from c7n.resources.ec2 import InstanceImageBase
+from c7n.resources.iam import CredentialReport
+from c7n.resources.kms import ResourceKmsKeyAlias
+
+from c7n.filters.related import RelatedResourceFilter
+import c7n.filters.iamaccess.CrossAccountAccessFilter
+import c7n.resources.secretsmanager.CrossAccountAccessFilter
 
 class FilterValidationError(Exception):
     pass
@@ -975,8 +982,97 @@ class ReduceFilter(BaseValueFilter):
             return sorted(items, key=key, reverse=(self.order == 'desc'))
 
 
+class InstanceImageMixin:
+    """
+    CELFilter MixIn class to provide InstanceImageBase to CEL
+    """
+    def get_instance_image(self, resource):
+        """
+        get_instance_image retrieves the image id from the provided resource
+        :param resource:
+        :return:
+        """
+        image_base = InstanceImageBase()
+        image = image_base.get_instance_image(resource)
+        return image
+
+
+# needs underlying class refactored to pass resource-specific RelatedIdsExpression
+# class RelatedResourceFilterMixin:
+#     """
+#     CELFilter MixIn class to provide RelatedResourceFilter to CEL
+#     """
+#     def get_related_ids(self, resources):
+#         related_resource_filter = RelatedResourceFilter()
+#         return related_resource_filter.get_related_ids(resources)
+#
+#     def get_related(self):
+#         pass
+
+
+class CredentialReportMixin:
+    """
+    CELFilter MixIn class to provide CredentialReportMixin to CEL
+    """
+    def get_credential_report(self):
+        """
+        get_credential_report retrieves a report about the user's IAM credentials
+        :return report:
+        """
+        credential_report = CredentialReport()
+        report = credential_report.get_credential_report()
+        return report
+
+
+class ResourceKmsKeyAliasMixin:
+    """
+    CELFilter MixIn class to provide ResourceKmsKeyAlias to CEL
+    """
+    def get_matching_aliases(self, resources):
+        """
+        get_matching_aliases retrieves keys aliases for the provided resources
+        :param resources:
+        :return:
+        """
+        resource_kms_key = ResourceKmsKeyAlias
+        matched = resource_kms_key.get_matching_aliases(resources)
+        return matched
+
+
+class CrossAccountAccessFilterMixin:
+    """
+    CELFilter MixIn class to provide CrossAccountAccessFilter to CEL
+    """
+    def get_accounts(self):
+        cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
+        accounts = cross_account_access.get_accounts()
+        return accounts
+
+    def get_vpcs(self):
+        cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
+        vpc = cross_account_access.get_vpcs()
+        return vpc
+
+    def get_vpces(self):
+        cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
+        vpce = cross_account_access.get_vpces()
+        return vpce
+
+    def get_orgids(self):
+        cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
+        org_ids = cross_account_access.get_orgids()
+        return org_ids
+
+    # from :py:class:`c7n.resources.secretsmanager.CrossAccountAccessFilter`
+    def get_resource_policy(self, resource):
+        cross_account_access = c7n.resources.secretsmanager.CrossAccountAccessFilter
+        policy = cross_account_access.get_resource_policy(resource)
+        return policy
+
+
+
 # eventually have this also extend MixIn classes as well
-class CELFilter(Filter):
+class CELFilter(Filter, CredentialReportMixin):
     """Generic CEL filter using CELPY
     """
     # expr = None
@@ -1051,3 +1147,55 @@ class CELFilter(Filter):
 
         print(f"\nRetrieved filtered resources {filtered_resources}")
         return filtered_resources
+
+    # def get_instance_image(self):
+        # from InstanceImageMixin
+
+    # def get_related_ids():
+        # from RelatedResourceMixin
+
+    # def get_related():
+        # from RelatedResourceMixin
+
+    # def get_matching_aliases():
+
+    # def get_accounts():
+
+    # def get_vpcs():
+
+    # def get_vpces():
+
+    # def get_orgids():
+
+    # def get_endpoints():
+
+    # def get_protocols():
+
+    # def get_resource_policy():
+
+    # def _pull_ec2_images():
+
+    # def _pull_asg_images():
+
+    # def _pull_asg_snapshots():
+
+    # def _pull_ami_snapshots():
+
+    # def service_role_usage():
+
+    # def instance_profile_usage():
+
+    # def scan_groups():
+
+    # def get_type_protections():
+
+    # def manager.get_model():
+
+    # def account_shield_subscriptions():
+
+
+    # C7N.filter.client.get_key_policy() ?
+
+    # C7N.filter.client.describe_subscription_filters ?
+
+    # C7N.filter.client.describe_snapshot_attribute ?
