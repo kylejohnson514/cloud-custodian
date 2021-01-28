@@ -34,6 +34,14 @@ from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.filters.related import RelatedResourceFilter
 import c7n.filters.iamaccess.CrossAccountAccessFilter
 import c7n.resources.secretsmanager.CrossAccountAccessFilter
+import c7n.resources.sns.SNSCrossAccount
+import c7n.resources.ami.ImageUnusedFilter
+import c7n.resources.ebs.SnapshotUnusedFilter
+import c7n.resources.iam.IamRoleUsage
+import c7n.resources.vpc.SGUsage
+import c7n.resources.shield
+import c7n.resources.account.ShieldEnabled
+
 
 class FilterValidationError(Exception):
     pass
@@ -984,13 +992,13 @@ class ReduceFilter(BaseValueFilter):
 
 class InstanceImageMixin:
     """
-    CELFilter MixIn class to provide InstanceImageBase to CEL
+    CELFilter Mixin class to provide InstanceImageBase to CEL
     """
     def get_instance_image(self, resource):
         """
         get_instance_image retrieves the image id from the provided resource
         :param resource:
-        :return:
+        :return image:
         """
         image_base = InstanceImageBase()
         image = image_base.get_instance_image(resource)
@@ -1012,7 +1020,7 @@ class InstanceImageMixin:
 
 class CredentialReportMixin:
     """
-    CELFilter MixIn class to provide CredentialReportMixin to CEL
+    CELFilter Mixin class to provide CredentialReportMixin to CEL
     """
     def get_credential_report(self):
         """
@@ -1026,13 +1034,13 @@ class CredentialReportMixin:
 
 class ResourceKmsKeyAliasMixin:
     """
-    CELFilter MixIn class to provide ResourceKmsKeyAlias to CEL
+    CELFilter Mixin class to provide ResourceKmsKeyAlias to CEL
     """
     def get_matching_aliases(self, resources):
         """
         get_matching_aliases retrieves keys aliases for the provided resources
         :param resources:
-        :return:
+        :return matched:
         """
         resource_kms_key = ResourceKmsKeyAlias
         matched = resource_kms_key.get_matching_aliases(resources)
@@ -1041,38 +1049,216 @@ class ResourceKmsKeyAliasMixin:
 
 class CrossAccountAccessFilterMixin:
     """
-    CELFilter MixIn class to provide CrossAccountAccessFilter to CEL
+    CELFilter Mixin class to provide CrossAccountAccessFilter to CEL
     """
     def get_accounts(self):
+        """
+        get_accounts retrieves list of whitelisted accounts
+        for use by the CrossAccountAccess filter
+        :return accounts:
+        """
         cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
         accounts = cross_account_access.get_accounts()
         return accounts
 
     def get_vpcs(self):
+        """
+        get_vpcs retrieves list of whitelisted VPCs
+        for use by the CrossAccountAccess filter
+        :return vpc:
+        """
         cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
         vpc = cross_account_access.get_vpcs()
         return vpc
 
     def get_vpces(self):
+        """
+        get_vpces retrieves list of whitelisted VPC endpoints
+        for use by the CrossAccountAccess filter
+        :return vpce:
+        """
         cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
         vpce = cross_account_access.get_vpces()
         return vpce
 
     def get_orgids(self):
+        """
+        get_orgids retrieves list of whitelisted org ids
+        for use by the CrossAccountAccess filter
+        :return org_ids:
+        """
         cross_account_access = c7n.filters.iamaccess.CrossAccountAccessFilter
         org_ids = cross_account_access.get_orgids()
         return org_ids
 
-    # from :py:class:`c7n.resources.secretsmanager.CrossAccountAccessFilter`
     def get_resource_policy(self, resource):
+        """
+        get_resource_policy retrieves the resource-based policy
+        for the provided resource for use by the CrossAccountAccess filter
+        :param resource:
+        :return policy:
+        """
         cross_account_access = c7n.resources.secretsmanager.CrossAccountAccessFilter
         policy = cross_account_access.get_resource_policy(resource)
         return policy
 
 
+class SNSCrossAccountMixin:
+    """
+    CELFilter Mixin class to provide SNSCrossAccount resource to CEL
+    """
+    def get_endpoints(self):
+        """
+        get_endpoints retrieves the whitelisted endpoints
+        for use by the SNSCrossAccount filter
+        :return endpoints:
+        """
+        sns_cross_account = c7n.resources.sns.SNSCrossAccount
+        endpoints = sns_cross_account.get_endpoints()
+        return endpoints
 
-# eventually have this also extend MixIn classes as well
-class CELFilter(Filter, CredentialReportMixin):
+    def get_protocols(self):
+        """
+        get_protocols retrieves the allowed protocols
+        for use by the SNSCrossAccount filter
+        :return protocols:
+        """
+        sns_cross_account = c7n.resources.sns.SNSCrossAccount
+        protocols = sns_cross_account.get_protocols()
+        return protocols
+
+
+class ImagesUnusedMixin:
+    """
+    CELFilter Mixin class to provide ImageUnusedFilter resource to CEL
+    """
+    def _pull_ec2_images(self):
+        """
+        _pull_ec2_images retrieves used/unused ec2 images
+        :return images:
+        """
+        image_unused_filter = c7n.resources.ami.ImageUnusedFilter
+        images = image_unused_filter._pull_ec2_images()
+        return images
+
+    def _pull_asg_images(self):
+        """
+        _pull_asg_images retrieves used/unused images in ASG launch configurations
+        :return images:
+        """
+        image_unused_filter = c7n.resources.ami.ImageUnusedFilter
+        images = image_unused_filter._pull_asg_images()
+        return images
+
+
+class SnapshotUnusedMixin:
+    """
+    CELFilter Mixin class to provide SnapshotUnusedMixin filter to CEL
+    """
+    def _pull_asg_snapshots(self):
+        """
+        _pull_asg_snapshots retrieves used/unused snapshots from
+        ASG launch configurations
+        :return asg_snapshots:
+        """
+        snapshot_unused_filter = c7n.resources.ebs.SnapshotUnusedFilter
+        asg_snapshots = snapshot_unused_filter._pull_asg_snapshots()
+        return asg_snapshots
+
+    def _pull_ami_snapshots(self):
+        """
+        _pull_ami_snapshots retrieves used/unused snapshots of AMIs
+        :return ami_snapshots:
+        """
+        snapshot_unused_filter = c7n.resources.ebs.SnapshotUnusedFilter
+        ami_snapshots = snapshot_unused_filter._pull_ami_snapshots()
+        return ami_snapshots
+
+
+class IamRoleUsageMixin:
+    """
+    CELFilter Mixin class to provide IamRoleUsage filter to CEL
+    """
+    def service_role_usage(self):
+        """
+        service_role_usage retrieves IAM roles being used by
+        Lambda functions & ECS Clusters, as well as IAM roles
+        attached to instance profiles of EC2/ASG resources
+        :return results:
+        """
+        iam_role_usage = c7n.resources.iam.IamRoleUsage
+        results = iam_role_usage.service_role_usage()
+        return results
+
+    def instance_profile_usage(self):
+        """
+        instance_profile_usage retrieves IamInstanceProfiles
+        of EC2/ASG resources
+        :return results:
+        """
+        iam_role_usage = c7n.resources.iam.IamRoleUsage
+        results = iam_role_usage.instance_profile_usage()
+        return results
+
+
+class SGUsageMixin:
+    """
+    CELFilter Mixin class to provide SGUsage filter to CEL
+    """
+    def scan_groups(self, resource):
+        """
+        scan_groups retrieves a set of all security groups currently in use
+        :param resource:
+        :return used:
+        """
+        sg_usage = c7n.resources.vpc.SGUsage
+        used = sg_usage.scan_groups()
+        return used
+
+
+class IsShieldProtectedMixin:
+    """
+    CELFilter Mixin class to provide get_type_protections function to CEL
+    """
+    def get_type_protections(self, client, model):
+        """
+        get_type_protections retrieves a list of the resources
+        that are being protected by AWS Shield
+        :param client:
+        :param model:
+        :return protections:
+        """
+        return c7n.resources.shield.get_type_protections(client, model)
+
+
+#### follow up with steven on this
+#### is this what it's supposed to be doing?
+class ShieldEnabledMixin:
+    """
+    CELFilter Mixin class to provide ShieldEnabled filter to CEL
+    """
+    def account_shield_subscriptions(self, resource):
+        """
+        account_shield_subscriptions retrieves the resources in the account
+        that have subscriptions to AWS Shield
+        :param resource:
+        :return results:
+        """
+        shield_enabled = c7n.resources.account.ShieldEnabled
+        results = shield_enabled.process(resource)
+        return results
+
+
+class CELFilter(
+    Filter,
+    InstanceImageMixin,
+    CredentialReportMixin,
+    ResourceKmsKeyAliasMixin,
+    CrossAccountAccessFilterMixin,
+    SNSCrossAccountMixin,
+    ImagesUnusedMixin,
+
+):
     """Generic CEL filter using CELPY
     """
     # expr = None
