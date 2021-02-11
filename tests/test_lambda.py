@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 from mock import patch
+import celpy
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
@@ -583,3 +584,25 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+class TestCEL(BaseTest):
+    def test_celfilter_lambda_tags(self):
+        session_factory = self.replay_flight_data("test_celfilter_lambda_tags")
+
+        p = self.load_policy(
+            {
+                "name": "lambda-runtime",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": "Resource[\"Runtime\"] == \"python3.7\""
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
