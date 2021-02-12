@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .cel import CELFilter
 from .core import (
     ANNOTATION_KEY,
     FilterValidationError,
@@ -13,6 +12,7 @@ from .core import (
     AgeFilter,
     EventFilter,
     ReduceFilter,
+    CELFilter,
 )
 from .config import ConfigCompliance
 from .health import HealthEventFilter
