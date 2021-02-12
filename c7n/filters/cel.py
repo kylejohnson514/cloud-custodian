@@ -1,8 +1,8 @@
-import datetime
-import celpy
-
-from c7n.filters import Filter
-from c7n.exceptions import PolicyValidationError
+# import datetime
+# import celpy
+#
+# from c7n.filters import Filter
+# from c7n.exceptions import PolicyValidationError
 from c7n.resources.ec2 import InstanceImageBase
 
 

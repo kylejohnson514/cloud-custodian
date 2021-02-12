@@ -12,7 +12,7 @@ from .core import (
     AgeFilter,
     EventFilter,
     ReduceFilter,
-    CELFilter,
+    # CELFilter,
 )
 from .config import ConfigCompliance
 from .health import HealthEventFilter

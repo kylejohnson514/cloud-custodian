@@ -11,6 +11,9 @@ import ipaddress
 import logging
 import operator
 import re
+import celpy
+import celpy.c7nlib
+import celpy.celtypes
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -23,6 +26,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
+from c7n.filters.cel import InstanceImageMixin
 
 class FilterValidationError(Exception):
     pass
@@ -921,6 +925,7 @@ class ReduceFilter(BaseValueFilter):
 
 class CELFilter(
     Filter,
+    InstanceImageMixin,
 ):
     """Generic CEL filter using CELPY
     """
