@@ -17,13 +17,9 @@ from dateutil.parser import parse
 from distutils import version
 from random import sample
 import jmespath
-import celpy
-import celpy.c7nlib
-import celpy.celtypes
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
-from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
@@ -102,59 +98,6 @@ VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
     'unique_size', 'date', 'version']
-
-
-class FilterRegistry(PluginRegistry):
-
-    def __init__(self, *args, **kw):
-        super(FilterRegistry, self).__init__(*args, **kw)
-        self.register('value', ValueFilter)
-        self.register('or', Or)
-        self.register('and', And)
-        self.register('not', Not)
-        self.register('event', EventFilter)
-        self.register('reduce', ReduceFilter)
-        self.register('cel', CELFilter)
-
-    def parse(self, data, manager):
-        results = []
-        for d in data:
-            results.append(self.factory(d, manager))
-        return results
-
-    def factory(self, data, manager=None):
-        """Factory func for filters.
-
-        data - policy config for filters
-        manager - resource type manager (ec2, s3, etc)
-        """
-
-        # Make the syntax a little nicer for common cases.
-        if isinstance(data, dict) and len(data) == 1 and 'type' not in data:
-            op = list(data.keys())[0]
-            if op == 'or':
-                return self['or'](data, self, manager)
-            elif op == 'and':
-                return self['and'](data, self, manager)
-            elif op == 'not':
-                return self['not'](data, self, manager)
-            return ValueFilter(data, manager)
-        if isinstance(data, str):
-            filter_type = data
-            data = {'type': data}
-        else:
-            filter_type = data.get('type')
-        if not filter_type:
-            raise PolicyValidationError(
-                "%s Invalid Filter %s" % (
-                    self.plugin_type, data))
-        filter_class = self.get(filter_type)
-        if filter_class is not None:
-            return filter_class(data, manager)
-        else:
-            raise PolicyValidationError(
-                "%s Invalid filter type %s" % (
-                    self.plugin_type, data))
 
 
 def trim_runtime(filters):
@@ -974,81 +917,3 @@ class ReduceFilter(BaseValueFilter):
             return items[::-1]
         else:
             return sorted(items, key=key, reverse=(self.order == 'desc'))
-
-
-class CELFilter(
-    Filter,
-):
-    """Generic CEL filter using CELPY
-    """
-
-    def __init__(self, data, manager):
-        super().__init__(data, manager)
-        assert data["type"].lower() == "cel"
-        self.expr = data["expr"]
-        self.parser = None
-        self.cel_env = None
-        self.cel_ast = None
-
-        # pull all valid resource values from default CEL
-        self.decls = {
-            "Resource": celpy.celtypes.MapType,
-            "Now": celpy.celtypes.TimestampType
-        }
-
-        # update possible resource vals with Custodian value filter function names
-        self.decls.update(celpy.c7nlib.DECLARATIONS)
-
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'required': ['type'],
-        'properties': {
-            'type': {'enum': ['cel']},
-            'expr': {'type': 'string'}
-        }
-    }
-    schema_alias = True
-    annotate = True
-    required_keys = {'cel', 'expr'}
-
-    def validate(self):
-        for filter in self.manager.data["filters"]:
-            if 'expr' not in filter:
-                raise PolicyValidationError(
-                    f"CEL filters can only be used with provided expressions in {self.manager.data}"
-                )
-
-        # create our CEL env to be used for evaluating/processing the CEL expressions
-        # (use C7N_Interpreted_Runner to provide a runner class that also includes option
-        # of providing a C7N filter as an argument for the Environment's runner_class var)
-        self.cel_env = celpy.Environment(annotations=self.decls, runner_class=celpy.c7nlib.C7N_Interpreted_Runner)
-
-        # Compile the policy-provided "expr" string to see if it's a valid CEL expr or if it raises syntax errors
-        print(f"Data we are trying to send into celpy as the expression: {self.expr}\n")
-        self.cel_ast = self.cel_env.compile(self.data["expr"])
-        print(f"self.cel_ast retrieved after parsing the provided policy to cel: {self.cel_ast}")
-        return self
-
-    def process(self, resources, event=None, filter=Filter):
-        # if event is None:
-        #     return resources
-
-        filtered_resources = []
-        for resource in resources:
-            # transforms updated AST with celpy functions including C7N additions
-            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
-            cel_activation = {
-                "Resource": celpy.json_to_cel(resource),
-                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
-            }
-
-            # this uses the C7n_Interpreted_Runner and actually calls evaluate() to run the expr
-            # against a resource to see if it is included or not by the expr's filters
-            with celpy.c7nlib.C7NContext(filter=self):  # Extends all MixIn filters to make them accessible for celpy code
-                cel_result = cel_prgm.evaluate(cel_activation, self)
-                if cel_result:
-                    filtered_resources.append(resource)
-
-        print(f"\nRetrieved filtered resources {filtered_resources}")
-        return filtered_resources

@@ -1,10 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from .cel import CELFilter
 from .core import (
     ANNOTATION_KEY,
     FilterValidationError,
     OPERATORS,
-    FilterRegistry,
     Filter,
     Or,
     And,
@@ -19,4 +19,5 @@ from .health import HealthEventFilter
 from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
+from .registry import FilterRegistry
 from .vpc import DefaultVpcBase
