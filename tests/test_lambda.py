@@ -587,8 +587,8 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
 
 class TestCEL(BaseTest):
-    def test_celfilter_lambda_tags(self):
-        session_factory = self.replay_flight_data("test_celfilter_lambda_tags")
+    def test_celfilter_lambda_runtime(self):
+        session_factory = self.replay_flight_data("test_celfilter_lambda_runtime")
 
         p = self.load_policy(
             {

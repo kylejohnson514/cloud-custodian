@@ -114,7 +114,6 @@ class FilterRegistry(PluginRegistry):
         self.register('not', Not)
         self.register('event', EventFilter)
         self.register('reduce', ReduceFilter)
-        self.register('cel', CELFilter)
 
     def parse(self, data, manager):
         results = []
@@ -976,11 +975,8 @@ class ReduceFilter(BaseValueFilter):
             return sorted(items, key=key, reverse=(self.order == 'desc'))
 
 
-class CELFilter(
-    Filter,
-):
-    """Generic CEL filter using CELPY
-    """
+class CELFilter(Filter):
+    """Generic CEL filter using CELPY"""
 
     def __init__(self, data, manager):
         super().__init__(data, manager)
@@ -989,14 +985,10 @@ class CELFilter(
         self.parser = None
         self.cel_env = None
         self.cel_ast = None
-
-        # pull all valid resource values from default CEL
         self.decls = {
             "Resource": celpy.celtypes.MapType,
             "Now": celpy.celtypes.TimestampType
         }
-
-        # update possible resource vals with Custodian value filter function names
         self.decls.update(celpy.c7nlib.DECLARATIONS)
 
     schema = {
@@ -1019,9 +1011,6 @@ class CELFilter(
                     f"CEL filters can only be used with provided expressions in {self.manager.data}"
                 )
 
-        # create our CEL env to be used for evaluating/processing the CEL expressions
-        # (use C7N_Interpreted_Runner to provide a runner class that also includes option
-        # of providing a C7N filter as an argument for the Environment's runner_class var)
         self.cel_env = celpy.Environment(annotations=self.decls, runner_class=celpy.c7nlib.C7N_Interpreted_Runner)
 
         # Compile the policy-provided "expr" string to see if it's a valid CEL expr or if it raises syntax errors
@@ -1031,20 +1020,14 @@ class CELFilter(
         return self
 
     def process(self, resources, event=None, filter=Filter):
-        # if event is None:
-        #     return resources
-
         filtered_resources = []
         for resource in resources:
-            # transforms updated AST with celpy functions including C7N additions
             cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
             cel_activation = {
                 "Resource": celpy.json_to_cel(resource),
                 "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
             }
 
-            # this uses the C7n_Interpreted_Runner and actually calls evaluate() to run the expr
-            # against a resource to see if it is included or not by the expr's filters
             with celpy.c7nlib.C7NContext(filter=self):  # Extends all MixIn filters to make them accessible for celpy code
                 cel_result = cel_prgm.evaluate(cel_activation, self)
                 if cel_result:

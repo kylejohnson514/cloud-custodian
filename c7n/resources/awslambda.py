@@ -10,6 +10,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CELFilter as BaseCELFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -77,6 +78,13 @@ class AWSLambda(query.QueryResourceManager):
 
     def get_resources(self, ids, cache=True, augment=False):
         return super(AWSLambda, self).get_resources(ids, cache, augment)
+
+
+## define mixin all needed ec2 mixins here, then include in CELFilter def'n below
+
+@AWSLambda.filter_registry.register('cel')
+class CELFilter(BaseCELFilter):
+    RelatedIdsExpression = ""
 
 
 @AWSLambda.filter_registry.register('security-group')
