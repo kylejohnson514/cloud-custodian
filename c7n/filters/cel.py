@@ -17,10 +17,7 @@ class InstanceImageMixin:
         :param resource:
         :return image:
         """
-        # image_base = InstanceImageBase
-        print(f"\nMaking call to get_instance_image in Mixin class...")
         image_base = InstanceImageBase()
-        print(f"Created image_base object: {image_base}")
         image = image_base.get_instance_image(resource)
         # image = get_instance_image(resource)
         print(f"\nRetrieved image from Mixin class: {image}...")
