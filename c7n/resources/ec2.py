@@ -6,11 +6,13 @@ import operator
 import random
 import re
 import zlib
+import datetime
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 import jmespath
+import celpy
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
@@ -22,6 +24,7 @@ from c7n.filters import (
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+from c7n.filters import CELFilter as BaseCELFilter
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -2199,3 +2202,46 @@ class DedicatedHost(query.QueryResourceManager):
         date = 'AllocationTime'
         cfn_type = config_type = 'AWS::EC2::Host'
         permissions_enum = ('ec2:DescribeHosts',)
+
+
+class InstanceImageMixin(InstanceImageBase):
+    """
+    CELFilter Mixin class to provide InstanceImageBase to CEL
+    """
+
+    def get_instance_image(self, resource):
+        """
+        get_instance_image retrieves the image id from the provided resource
+        :param resource:
+        :return image:
+        """
+        image = super().get_instance_image(resource)
+        return image
+
+
+@filters.register('cel')
+class CELFilter(BaseCELFilter, InstanceImageMixin):
+    """
+    EC2-specific implementation of CELFilter
+    """
+
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None, filter=Filter):
+        super().prefetch_instance_images(resources)
+
+        filtered_resources = []
+        for resource in resources:
+            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+            cel_activation = {
+                "Resource": celpy.json_to_cel(resource),
+                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+            }
+
+            with celpy.c7nlib.C7NContext(filter=self):
+                cel_result = cel_prgm.evaluate(cel_activation, self)
+                if cel_result:
+                    filtered_resources.append(resource)
+
+        return filtered_resources

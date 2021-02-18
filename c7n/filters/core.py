@@ -28,6 +28,7 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
 
+
 class FilterValidationError(Exception):
     pass
 
@@ -981,7 +982,8 @@ class CELFilter(Filter):
     def __init__(self, data, manager):
         super().__init__(data, manager)
         assert data["type"].lower() == "cel"
-        self.expr = data["expr"]
+        # throw error if expr missing? or run and just return resources as if empty filter applied?
+        self.expr = data.get("expr")
         self.parser = None
         self.cel_env = None
         self.cel_ast = None
@@ -1012,11 +1014,7 @@ class CELFilter(Filter):
                 )
 
         self.cel_env = celpy.Environment(annotations=self.decls, runner_class=celpy.c7nlib.C7N_Interpreted_Runner)
-
-        # Compile the policy-provided "expr" string to see if it's a valid CEL expr or if it raises syntax errors
-        print(f"Data we are trying to send into celpy as the expression: {self.expr}\n")
         self.cel_ast = self.cel_env.compile(self.data["expr"])
-        print(f"self.cel_ast retrieved after parsing the provided policy to cel: {self.cel_ast}")
         return self
 
     def process(self, resources, event=None, filter=Filter):
@@ -1028,10 +1026,9 @@ class CELFilter(Filter):
                 "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
             }
 
-            with celpy.c7nlib.C7NContext(filter=self):  # Extends all MixIn filters to make them accessible for celpy code
+            with celpy.c7nlib.C7NContext(filter=self):
                 cel_result = cel_prgm.evaluate(cel_activation, self)
                 if cel_result:
                     filtered_resources.append(resource)
 
-        print(f"\nRetrieved filtered resources {filtered_resources}")
         return filtered_resources
