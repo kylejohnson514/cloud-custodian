@@ -80,8 +80,6 @@ class AWSLambda(query.QueryResourceManager):
         return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
-## define mixin all needed ec2 mixins here, then include in CELFilter def'n below
-
 @AWSLambda.filter_registry.register('cel')
 class CELFilter(BaseCELFilter):
     RelatedIdsExpression = ""

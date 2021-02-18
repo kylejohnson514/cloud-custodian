@@ -1013,7 +1013,10 @@ class CELFilter(Filter):
                     f"CEL filters can only be used with provided expressions in {self.manager.data}"
                 )
 
-        self.cel_env = celpy.Environment(annotations=self.decls, runner_class=celpy.c7nlib.C7N_Interpreted_Runner)
+        self.cel_env = celpy.Environment(
+            annotations=self.decls,
+            runner_class=celpy.c7nlib.C7N_Interpreted_Runner
+        )
         self.cel_ast = self.cel_env.compile(self.data["expr"])
         return self
 

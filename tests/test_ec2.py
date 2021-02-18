@@ -1977,8 +1977,6 @@ class TestDedicatedHost(BaseTest):
             'resource': 'aws.ec2-host'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
-        factory = self.replay_flight_data("test_launch_template_id_not_found")
-        good_lt_id = 'lt-0877401c93c294001'
 
 
 class TestCEL(BaseTest):
