@@ -2204,23 +2204,8 @@ class DedicatedHost(query.QueryResourceManager):
         permissions_enum = ('ec2:DescribeHosts',)
 
 
-class InstanceImageMixin(InstanceImageBase):
-    """
-    CELFilter Mixin class to provide InstanceImageBase to CEL
-    """
-
-    def get_instance_image(self, resource):
-        """
-        get_instance_image retrieves the image id from the provided resource
-        :param resource:
-        :return image:
-        """
-        image = super().get_instance_image(resource)
-        return image
-
-
 @filters.register('cel')
-class CELFilter(BaseCELFilter, InstanceImageMixin):
+class CELFilter(BaseCELFilter, InstanceImageBase):
     """
     EC2-specific implementation of CELFilter
     """
