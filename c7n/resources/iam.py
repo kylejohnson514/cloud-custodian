@@ -10,6 +10,7 @@ from datetime import timedelta
 import itertools
 import time
 from xml.etree import ElementTree
+import celpy
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
@@ -21,6 +22,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
+from c7n.filters import CELFilter as BaseCELFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -2390,3 +2392,62 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@User.filter_registry.register('cel')
+class CELFilter(BaseCELFilter, CredentialReport):
+    schema = type_schema(
+        'cel',
+        type='object',
+        required=['type'],
+        properties={
+            'type': {'enum': ['cel']},
+            'expr': {'type': 'string'}
+        },
+        report_generate={
+            'title': 'Generate a report if none is present.',
+            'default': True,
+            'type': 'boolean'},
+        report_delay={
+            'title': 'Number of seconds to wait for report generation.',
+            'default': 10,
+            'type': 'number'},
+        report_max_age={
+            'title': 'Number of seconds to consider a report valid.',
+            'default': 60 * 60 * 24,
+            'type': 'number'}
+    )
+
+    list_sub_objects = (
+        ('access_key_1_', 'access_keys'),
+        ('access_key_2_', 'access_keys'),
+        ('cert_1_', 'certs'),
+        ('cert_2_', 'certs'))
+
+    permissions = ('iam:GenerateCredentialReport',
+                   'iam:GetCredentialReport')
+
+    def get_credential_report(self):
+        report = super(CELFilter, self).get_credential_report()
+        if report is None:
+            return []
+        r = self.current_resource
+        info = report.get(r['UserName'])
+        return info
+
+    def process(self, resources, event=None, filter=Filter):
+        filtered_resources = []
+
+        for resource in resources:
+            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+            cel_activation = {
+                "Resource": celpy.json_to_cel(resource),
+                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+            }
+            self.current_resource = resource
+            with celpy.c7nlib.C7NContext(filter=self):
+                cel_result = cel_prgm.evaluate(cel_activation, self)
+                if cel_result:
+                    filtered_resources.append(resource)
+
+        return filtered_resources
