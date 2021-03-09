@@ -5,11 +5,14 @@ import operator
 import zlib
 import jmespath
 import re
+import datetime
+import celpy
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
+from c7n.filters import CELFilter as BaseCELFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -2512,3 +2515,52 @@ class CreateFlowLogs(BaseAction):
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+
+@Vpc.filter_registry.register('cel')
+class VpcCELFilter(
+    BaseCELFilter,
+    VpcSecurityGroupFilter,
+):
+    """Filter VPCs based on various attributes using CEL filter
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cel-vpc-by-sg
+                resource: vpc
+                filters:
+                  - type: cel
+                    expr:
+    """
+    schema = type_schema(
+        'cel',
+        type='object',
+        required=['type'],
+        properties={
+            'type': {'enum': ['cel']},
+            'expr': {'type': 'string'}
+        }
+    )
+
+    def get_related_sg_ids(self, resource):
+        self.RelatedResource = "c7n.resources.vpc.SecurityGroup"
+        self.RelatedIdsExpression = '[SecurityGroups][].GroupId'
+        self.AnnotationKey = "matched-vpcs"
+
+        related_sg_ids = VpcSecurityGroupFilter.get_related_ids(self, [resource])
+        return related_sg_ids
+
+    def get_related_sgs(self, resource):
+        resource_manager = self.get_resource_manager()
+        related_ids = self.get_related_sg_ids(resource)
+        model = resource_manager.get_model()
+        if len(related_ids) < self.FetchThreshold:
+            related = resource_manager.get_resources(list(related_ids))
+        else:
+            related = resource_manager.resources()
+
+        return [r for r in related
+                if r[model.id] in related_ids]
