@@ -2521,6 +2521,7 @@ class CreateFlowLogs(BaseAction):
 class VpcCELFilter(
     BaseCELFilter,
     VpcSecurityGroupFilter,
+    VpcNatGatewayFilter,
 ):
     """Filter VPCs based on various attributes using CEL filter
 
@@ -2545,17 +2546,8 @@ class VpcCELFilter(
         }
     )
 
-    def get_related_sg_ids(self, resource):
-        self.RelatedResource = "c7n.resources.vpc.SecurityGroup"
-        self.RelatedIdsExpression = '[SecurityGroups][].GroupId'
-        self.AnnotationKey = "matched-vpcs"
-
-        related_sg_ids = VpcSecurityGroupFilter.get_related_ids(self, [resource])
-        return related_sg_ids
-
-    def get_related_sgs(self, resource):
+    def get_related(self, related_ids):
         resource_manager = self.get_resource_manager()
-        related_ids = self.get_related_sg_ids(resource)
         model = resource_manager.get_model()
         if len(related_ids) < self.FetchThreshold:
             related = resource_manager.get_resources(list(related_ids))
@@ -2564,3 +2556,23 @@ class VpcCELFilter(
 
         return [r for r in related
                 if r[model.id] in related_ids]
+
+    def get_related_sg_ids(self, resource):
+        self.RelatedResource = "c7n.resources.vpc.SecurityGroup"
+        self.RelatedIdsExpression = '[SecurityGroups][].GroupId'
+        related_sg_ids = VpcSecurityGroupFilter.get_related_ids(self, [resource])
+        return related_sg_ids
+
+    def get_related_sgs(self, resource):
+        related_ids = self.get_related_sg_ids(resource)
+        return self.get_related(related_ids)
+
+    def get_related_subnet_ids(self, resource):
+        self.RelatedResource = "c7n.resources.vpc.Subnet"
+        self.RelatedIdsExpression = '[Subnets][].SubnetId'
+        related_sg_ids = VpcSubnetFilter.get_related_ids(self, [resource])
+        return related_sg_ids
+
+    def get_related_subnets(self, resource):
+        related_ids = self.get_related_subnet_ids(resource)
+        return self.get_related(related_ids)
