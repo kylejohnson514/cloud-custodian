@@ -1,0 +1,151 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-00014e1e28d66cc0c",
+                                "UserId": "012345678910"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "012345678910",
+                "GroupId": "sg-00014e1e28d66cc0c",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ],
+                "VpcId": "vpc-01a1ffc078406ab62"
+            },
+            {
+                "Description": "Communication between the control plane and worker nodegroups",
+                "GroupName": "eksctl-sanjay-cluster-ControlPlaneSecurityGroup-15P86WK3JDYJG",
+                "IpPermissions": [],
+                "OwnerId": "012345678910",
+                "GroupId": "sg-09266e431e8ec3480",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [
+                            {
+                                "CidrIpv6": "::/0"
+                            }
+                        ],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-01a1ffc078406ab62"
+            },
+            {
+                "Description": "Communication between all nodes in the cluster",
+                "GroupName": "eksctl-sanjay-cluster-ClusterSharedNodeSecurityGroup-1VNJ5QRAP32OA",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "Description": "Allow nodes to communicate with each other (all ports)",
+                                "GroupId": "sg-0ca336727e090cac2",
+                                "UserId": "012345678910"
+                            },
+                            {
+                                "Description": "Allow managed and unmanaged nodes to communicate with each other (all ports)",
+                                "GroupId": "sg-0cfa2edf5d7bfa375",
+                                "UserId": "012345678910"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "012345678910",
+                "GroupId": "sg-0ca336727e090cac2",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-01a1ffc078406ab62"
+            },
+            {
+                "Description": "EKS created security group applied to ENI that is attached to EKS Control Plane master nodes, as well as any managed workloads.",
+                "GroupName": "eks-cluster-sg-sanjay-909651390",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "Description": "Allow unmanaged nodes to communicate with control plane (all ports)",
+                                "GroupId": "sg-0ca336727e090cac2",
+                                "UserId": "012345678910"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "012345678910",
+                "GroupId": "sg-0cfa2edf5d7bfa375",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-01a1ffc078406ab62"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
