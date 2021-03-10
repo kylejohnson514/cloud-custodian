@@ -2519,6 +2519,7 @@ class CreateFlowLogs(BaseAction):
 class VpcCELFilter(
     BaseCELFilter,
     VpcSecurityGroupFilter,
+    VpcSubnetFilter,
     VpcNatGatewayFilter,
     VpcInternetGatewayFilter
 ):
