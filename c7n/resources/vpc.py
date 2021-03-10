@@ -5,8 +5,6 @@ import operator
 import zlib
 import jmespath
 import re
-import datetime
-import celpy
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -2522,6 +2520,7 @@ class VpcCELFilter(
     BaseCELFilter,
     VpcSecurityGroupFilter,
     VpcNatGatewayFilter,
+    VpcInternetGatewayFilter
 ):
     """Filter VPCs based on various attributes using CEL filter
 
@@ -2585,4 +2584,14 @@ class VpcCELFilter(
 
     def get_related_nat_gateways(self, resource):
         related_ids = self.get_related_nat_gateway_ids(resource)
+        return self.get_related(related_ids)
+
+    def get_related_igw_ids(self, resource):
+        self.RelatedResource = "c7n.resources.vpc.InternetGateway"
+        self.RelatedIdsExpression = '[InternetGateways][].InternetGatewayId'
+        related_igw_ids = VpcInternetGatewayFilter.get_related_ids(self, [resource])
+        return related_igw_ids
+
+    def get_related_igws(self, resource):
+        related_ids = self.get_related_igw_ids(resource)
         return self.get_related(related_ids)
