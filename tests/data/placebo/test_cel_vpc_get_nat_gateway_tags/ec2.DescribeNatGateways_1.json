@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "NatGateways": [
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 16,
+                    "minute": 24,
+                    "second": 23,
+                    "microsecond": 0
+                },
+                "NatGatewayAddresses": [
+                    {
+                        "AllocationId": "eipalloc-048211e0d9b124eca",
+                        "NetworkInterfaceId": "eni-05ee6903d6fa02150",
+                        "PrivateIp": "172.31.30.199",
+                        "PublicIp": "3.220.191.94"
+                    }
+                ],
+                "NatGatewayId": "nat-09bcca80fd58110ef",
+                "State": "available",
+                "SubnetId": "subnet-efbcccb7",
+                "VpcId": "vpc-d2d616b5",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ]
+            },
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 16,
+                    "minute": 31,
+                    "second": 33,
+                    "microsecond": 0
+                },
+                "NatGatewayAddresses": [
+                    {
+                        "AllocationId": "eipalloc-0156f64782e667029",
+                        "NetworkInterfaceId": "eni-04b212c621dfeecd2",
+                        "PrivateIp": "172.31.46.124",
+                        "PublicIp": "34.226.95.30"
+                    }
+                ],
+                "NatGatewayId": "nat-077f17f2fb01ef4e5",
+                "State": "available",
+                "SubnetId": "subnet-e3b194de",
+                "VpcId": "vpc-d2d616b5",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

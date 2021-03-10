@@ -2570,9 +2570,19 @@ class VpcCELFilter(
     def get_related_subnet_ids(self, resource):
         self.RelatedResource = "c7n.resources.vpc.Subnet"
         self.RelatedIdsExpression = '[Subnets][].SubnetId'
-        related_sg_ids = VpcSubnetFilter.get_related_ids(self, [resource])
-        return related_sg_ids
+        related_subnet_ids = VpcSubnetFilter.get_related_ids(self, [resource])
+        return related_subnet_ids
 
     def get_related_subnets(self, resource):
         related_ids = self.get_related_subnet_ids(resource)
+        return self.get_related(related_ids)
+
+    def get_related_nat_gateway_ids(self, resource):
+        self.RelatedResource = "c7n.resources.vpc.NATGateway"
+        self.RelatedIdsExpression = '[NatGateways][].NatGatewayId'
+        related_nat_gateway_ids = VpcNatGatewayFilter.get_related_ids(self, [resource])
+        return related_nat_gateway_ids
+
+    def get_related_nat_gateways(self, resource):
+        related_ids = self.get_related_nat_gateway_ids(resource)
         return self.get_related(related_ids)
