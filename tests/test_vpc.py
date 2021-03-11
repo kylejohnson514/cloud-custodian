@@ -3164,9 +3164,10 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": """
-                            map_keys_equal(get_related_sgs(Resource), \"TestTag\", \"TestValue\")
-                        """
+                        "expr": "get_related_sgs(Resource).exists(sn, sn.Tags.exists(t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"
+                            # """
+                            # map_keys_equal(get_related_sgs(Resource), \"TestTag\", \"TestValue\")
+                        # """
                     },
                 ],
             },
@@ -3186,11 +3187,12 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": """
-                            map_keys_equal(
-                                get_related_subnets(Resource), \"TestTag\", \"TestValue\"
-                            )
-                        """
+                        "expr": "get_related_subnets(Resource).exists(sn, sn.Tags.exists(t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"
+                            # """
+                            # map_keys_equal(
+                            #     get_related_subnets(Resource), \"TestTag\", \"TestValue\"
+                            # )
+                        # """
                     },
                 ],
             },
@@ -3211,11 +3213,12 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": """
-                            map_keys_equal(
-                                get_related_nat_gateways(Resource), \"TestTag\", \"TestValue\"
-                            )
-                        """
+                        "expr": "get_related_nat_gateways(Resource).exists(sn, sn.Tags.exists(t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"
+                            # """
+                            # map_keys_equal(
+                            #     get_related_nat_gateways(Resource), \"TestTag\", \"TestValue\"
+                            # )
+                        # """
                     },
                 ],
             },
@@ -3236,11 +3239,32 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": """
-                            map_keys_equal(
-                                get_related_igws(Resource), \"TestTag\", \"TestValue\"
-                            )
-                        """
+                        "expr": "get_related_igws(Resource).exists(sn, sn.Tags.exists(t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"
+                            # """
+                            # map_keys_equal(
+                            #     get_related_igws(Resource), \"TestTag\", \"TestValue\"
+                            # )
+                        # """
+                    },
+                ],
+            },
+            session_factory=session_factory,
+            cache=True
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_cel_vpc_nat_gateways_resource_count(self):
+        session_factory = self.replay_flight_data("test_cel_vpc_nat_gateways_resource_count")
+        p = self.load_policy(
+            {
+                "name": "test_cel_vpc_nat_gateways_count",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": "size(get_related_nat_gateways(Resource)) > 1"
                     },
                 ],
             },
