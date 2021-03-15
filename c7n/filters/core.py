@@ -17,9 +17,6 @@ from dateutil.parser import parse
 from distutils import version
 from random import sample
 import jmespath
-import celpy
-import celpy.c7nlib
-import celpy.celtypes
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
@@ -976,97 +973,106 @@ class ReduceFilter(BaseValueFilter):
             return sorted(items, key=key, reverse=(self.order == 'desc'))
 
 
-class CELFilter(Filter):
-    """Generic CEL filter using CEL-Python
+try:
+    import celpy
+    import celpy.c7nlib
+    import celpy.celtypes
 
-    CELFilter enables Custodian policy filters to be written as
-    simple Google Common Expression Language (CEL) expressions.
-    The celpy package exposes Custodian-specific functionality
-    via the c7nlib module. Functions from this module can be used
-    to write CEL expressions that carry out Custodian filtering logic.
+    class CELFilter(Filter):
+        """Generic CEL filter using CEL-Python
 
-    To pull all EC2 instances that are marked as running in Production
-    via a tag, you can access the EC2 resource's values, and use c7nlib's
-    key() function to compare the stored value of the tag.
+        CELFilter enables Custodian policy filters to be written as
+        simple Google Common Expression Language (CEL) expressions.
+        The celpy package exposes Custodian-specific functionality
+        via the c7nlib module. Functions from this module can be used
+        to write CEL expressions that carry out Custodian filtering logic.
 
-    :example:
+        To pull all EC2 instances that are marked as running in Production
+        via a tag, you can access the EC2 resource's values, and use c7nlib's
+        key() function to compare the stored value of the tag.
 
-    .. code-block:: yaml
+        :example:
 
-      - name: ec2-prod-tags-cel
-        resource: ec2
-        filters:
-          - type: cel
-            expr: resource['Tags'].key('OwnerContact')['Value'] == 'Production'
+        .. code-block:: yaml
 
-    Similarly, to find EC2 instances that are running on outdated AMIs
-    (i.e. images older than 90 days), you can make use of the `now` field
-    to make comparisons using the current date and time.
+          - name: ec2-prod-tags-cel
+            resource: ec2
+            filters:
+              - type: cel
+                expr: resource['Tags'].key('OwnerContact')['Value'] == 'Production'
 
-    :example:
+        Similarly, to find EC2 instances that are running on outdated AMIs
+        (i.e. images older than 90 days), you can make use of the `now` field
+        to make comparisons using the current date and time.
 
-    .. code-block:: yaml
+        :example:
 
-      - name: ec2-aged-amis-cel
-        resource: ec2
-        filters:
-          - type: cel
-            expr: now - resource.image().CreationDate >= duration('90d')
-    """
+        .. code-block:: yaml
 
-    def __init__(self, data, manager):
-        super().__init__(data, manager)
-        assert data["type"].lower() == "cel"
-        # throw error if expr missing? or run and just return resources as if empty filter applied?
-        self.expr = data.get("expr")
-        self.parser = None
-        self.cel_env = None
-        self.cel_ast = None
-        self.decls = {
-            "resource": celpy.celtypes.MapType,
-            "now": celpy.celtypes.TimestampType
-        }
-        self.decls.update(celpy.c7nlib.DECLARATIONS)
+          - name: ec2-aged-amis-cel
+            resource: ec2
+            filters:
+              - type: cel
+                expr: now - resource.image().CreationDate >= duration('90d')
+        """
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'required': ['type'],
-        'properties': {
-            'type': {'enum': ['cel']},
-            'expr': {'type': 'string'}
-        }
-    }
-    schema_alias = True
-    annotate = True
-    required_keys = {'cel', 'expr'}
-
-    def validate(self):
-        for filter in self.manager.data["filters"]:
-            if 'expr' not in filter:
-                raise PolicyValidationError(
-                    f"CEL filters can only be used with provided expressions in {self.manager.data}"
-                )
-
-        self.cel_env = celpy.Environment(
-            annotations=self.decls,
-            runner_class=celpy.c7nlib.C7N_Interpreted_Runner
-        )
-        self.cel_ast = self.cel_env.compile(self.data["expr"])
-        return self
-
-    def process(self, resources, event=None, filter=Filter):
-        filtered_resources = []
-        for r in resources:
-            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
-            cel_activation = {
-                "resource": celpy.json_to_cel(r),
-                "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+        def __init__(self, data, manager):
+            super().__init__(data, manager)
+            assert data["type"].lower() == "cel"
+            # throw error if expr missing?
+            # or run and just return resources as if empty filter applied?
+            self.expr = data.get("expr")
+            self.parser = None
+            self.cel_env = None
+            self.cel_ast = None
+            self.decls = {
+                "resource": celpy.celtypes.MapType,
+                "now": celpy.celtypes.TimestampType
             }
+            self.decls.update(celpy.c7nlib.DECLARATIONS)
 
-            with celpy.c7nlib.C7NContext(filter=self):
-                cel_result = cel_prgm.evaluate(cel_activation, self)
-                if cel_result:
-                    filtered_resources.append(r)
+        schema = {
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['type'],
+            'properties': {
+                'type': {'enum': ['cel']},
+                'expr': {'type': 'string'}
+            }
+        }
+        schema_alias = True
+        annotate = True
+        required_keys = {'cel', 'expr'}
 
-        return filtered_resources
+        def validate(self):
+            for filter in self.manager.data["filters"]:
+                if 'expr' not in filter:
+                    raise PolicyValidationError(
+                        f"""CEL filters can only be used with provided expressions in
+                        {self.manager.data}"""
+                    )
+
+            self.cel_env = celpy.Environment(
+                annotations=self.decls,
+                runner_class=celpy.c7nlib.C7N_Interpreted_Runner
+            )
+            self.cel_ast = self.cel_env.compile(self.data["expr"])
+            return self
+
+        def process(self, resources, event=None, filter=Filter):
+            filtered_resources = []
+            for r in resources:
+                cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+                cel_activation = {
+                    "resource": celpy.json_to_cel(r),
+                    "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+                }
+
+                with celpy.c7nlib.C7NContext(filter=self):
+                    cel_result = cel_prgm.evaluate(cel_activation, self)
+                    if cel_result:
+                        filtered_resources.append(r)
+
+            return filtered_resources
+except ImportError:
+    raise
