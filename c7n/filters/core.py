@@ -977,7 +977,42 @@ class ReduceFilter(BaseValueFilter):
 
 
 class CELFilter(Filter):
-    """Generic CEL filter using CELPY"""
+    """Generic CEL filter using CEL-Python
+
+    CELFilter enables Custodian policy filters to be written as
+    simple Google Common Expression Language (CEL) expressions.
+    The celpy package exposes Custodian-specific functionality
+    via the c7nlib module. Functions from this module can be used
+    to write CEL expressions that carry out Custodian filtering logic.
+
+    To pull all EC2 instances that are marked as running in Production
+    via a tag, you can access the EC2 resource's values, and use c7nlib's
+    key() function to compare the stored value of the tag.
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: ec2-prod-tags-cel
+        resource: ec2
+        filters:
+          - type: cel
+            expr: resource['Tags'].key('OwnerContact')['Value'] == 'Production'
+
+    Similarly, to find EC2 instances that are running on outdated AMIs
+    (i.e. images older than 90 days), you can make use of the `now` field
+    to make comparisons using the current date and time.
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: ec2-aged-amis-cel
+        resource: ec2
+        filters:
+          - type: cel
+            expr: now - resource.image().CreationDate >= duration('90d')
+    """
 
     def __init__(self, data, manager):
         super().__init__(data, manager)
@@ -988,8 +1023,8 @@ class CELFilter(Filter):
         self.cel_env = None
         self.cel_ast = None
         self.decls = {
-            "Resource": celpy.celtypes.MapType,
-            "Now": celpy.celtypes.TimestampType
+            "resource": celpy.celtypes.MapType,
+            "now": celpy.celtypes.TimestampType
         }
         self.decls.update(celpy.c7nlib.DECLARATIONS)
 
@@ -1022,16 +1057,16 @@ class CELFilter(Filter):
 
     def process(self, resources, event=None, filter=Filter):
         filtered_resources = []
-        for resource in resources:
+        for r in resources:
             cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
             cel_activation = {
-                "Resource": celpy.json_to_cel(resource),
-                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+                "resource": celpy.json_to_cel(r),
+                "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
             }
 
             with celpy.c7nlib.C7NContext(filter=self):
                 cel_result = cel_prgm.evaluate(cel_activation, self)
                 if cel_result:
-                    filtered_resources.append(resource)
+                    filtered_resources.append(r)
 
         return filtered_resources

@@ -82,7 +82,9 @@ class AWSLambda(query.QueryResourceManager):
 
 @AWSLambda.filter_registry.register('cel')
 class CELFilter(BaseCELFilter):
-    RelatedIdsExpression = ""
+    """
+    Provide CELFilter support for Lambda functions
+    """
 
 
 @AWSLambda.filter_registry.register('security-group')

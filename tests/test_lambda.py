@@ -596,7 +596,7 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": "Resource[\"Runtime\"] == \"python3.7\""
+                        "expr": "resource[\"Runtime\"] == \"python3.7\""
                     },
                 ],
             },

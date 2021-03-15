@@ -2217,16 +2217,16 @@ class CELFilter(BaseCELFilter, InstanceImageBase):
         super().prefetch_instance_images(resources)
 
         filtered_resources = []
-        for resource in resources:
+        for r in resources:
             cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
             cel_activation = {
-                "Resource": celpy.json_to_cel(resource),
-                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+                "resource": celpy.json_to_cel(r),
+                "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
             }
 
             with celpy.c7nlib.C7NContext(filter=self):
                 cel_result = cel_prgm.evaluate(cel_activation, self)
                 if cel_result:
-                    filtered_resources.append(resource)
+                    filtered_resources.append(r)
 
         return filtered_resources

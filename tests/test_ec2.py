@@ -1990,7 +1990,7 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": "absent(Resource[\"Tags\"].key(\"OwnerContact\"))",
+                        "expr": "absent(resource[\"Tags\"].key(\"OwnerContact\"))",
                     },
                 ],
             },
@@ -2010,7 +2010,7 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": "Now - Resource.image().CreationDate >= duration(\"90d\")"
+                        "expr": "now - resource.image().CreationDate >= duration(\"90d\")"
                     },
                 ],
             },
